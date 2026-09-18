@@ -1,9 +1,9 @@
-import mockResponse from '../mock/mockResponse.json'
+import mockResponse from '../data/shipmentAnalysis.json'
 
 const wait = (duration) => new Promise((resolve) => setTimeout(resolve, duration))
 
 export async function analyzeShipment(payload) {
-  if (import.meta.env.VITE_USE_MOCK === 'true') {
+  if (import.meta.env.VITE_USE_MOCK !== 'false') {
     await wait(800)
     const quantityFactor = Math.max(0.92, Math.min(1.08, Number(payload.cargo_quantity || 50000) / 50000))
     const currentRate = Math.round(mockResponse.decision.current_rate * quantityFactor)
