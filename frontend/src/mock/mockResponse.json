@@ -1,0 +1,33 @@
+{
+  "forecast": { "best": 27000, "expected": 29000, "worst": 35000 },
+  "decision": {
+    "decision": "WAIT",
+    "current_rate": 32000,
+    "best_case_saving": 5000,
+    "expected_saving": 3000,
+    "worst_case_loss": 3000,
+    "waiting_cost": 500,
+    "net_expected_saving": 2500,
+    "reason": "Expected freight rate is lower than the current rate after accounting for waiting cost."
+  },
+  "confidence": 0.82,
+  "risk": "MEDIUM",
+  "monte_carlo": { "expected_future_rate": 29200, "simulated_q10": 27100, "simulated_q50": 29050, "simulated_q90": 34800 },
+  "forecast_series": [
+    { "day": 1, "expected": 32000, "lower": 31000, "upper": 33000 },
+    { "day": 2, "expected": 31000, "lower": 29800, "upper": 32400 },
+    { "day": 3, "expected": 29000, "lower": 27500, "upper": 30900 },
+    { "day": 4, "expected": 27000, "lower": 25200, "upper": 29400 },
+    { "day": 5, "expected": 27800, "lower": 25800, "upper": 30500 },
+    { "day": 6, "expected": 28600, "lower": 26400, "upper": 31500 },
+    { "day": 7, "expected": 28100, "lower": 25800, "upper": 31300 },
+    { "day": 8, "expected": 29500, "lower": 27000, "upper": 32900 },
+    { "day": 9, "expected": 28800, "lower": 26100, "upper": 32400 },
+    { "day": 10, "expected": 30000, "lower": 27200, "upper": 33900 },
+    { "day": 11, "expected": 29400, "lower": 26500, "upper": 33400 },
+    { "day": 12, "expected": 30200, "lower": 27200, "upper": 34500 },
+    { "day": 13, "expected": 29800, "lower": 26700, "upper": 34200 },
+    { "day": 14, "expected": 30600, "lower": 27400, "upper": 35100 }
+  ],
+  "recommended_vessel": { "vessel": "MV Ocean Star", "type": "Panamax", "distance_nm": 320, "available": true }
+}
