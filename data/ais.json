@@ -1,0 +1,50 @@
+[
+  {
+    "vessel_id": "VES001",
+    "latitude": 20.264,
+    "longitude": 86.703,
+    "speed": 10.5,
+    "heading": 90,
+    "timestamp": "2026-09-19T10:00:00Z"
+  },
+  {
+    "vessel_id": "VES002",
+    "latitude": 17.686,
+    "longitude": 83.218,
+    "speed": 8.2,
+    "heading": 180,
+    "timestamp": "2026-09-19T10:00:00Z"
+  },
+  {
+    "vessel_id": "VES003",
+    "latitude": 20.675,
+    "longitude": 86.941,
+    "speed": 11.0,
+    "heading": 270,
+    "timestamp": "2026-09-19T10:00:00Z"
+  },
+  {
+    "vessel_id": "VES004",
+    "latitude": 17.000,
+    "longitude": 83.250,
+    "speed": 12.5,
+    "heading": 45,
+    "timestamp": "2026-09-19T10:00:00Z"
+  },
+  {
+    "vessel_id": "VES005",
+    "latitude": 22.020,
+    "longitude": 88.060,
+    "speed": 0,
+    "heading": 0,
+    "timestamp": "2026-09-19T10:00:00Z"
+  },
+  {
+    "vessel_id": "VES006",
+    "latitude": 19.267,
+    "longitude": 84.901,
+    "speed": 9.0,
+    "heading": 135,
+    "timestamp": "2026-09-19T10:00:00Z"
+  }
+]

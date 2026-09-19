@@ -1,0 +1,44 @@
+[
+  {
+    "port": "Paradip",
+    "max_draft": 14.5,
+    "max_LOA": 250,
+    "max_beam": 40,
+    "cargo_handling_rate": 30000
+  },
+  {
+    "port": "Vizag",
+    "max_draft": 16.0,
+    "max_LOA": 300,
+    "max_beam": 45,
+    "cargo_handling_rate": 35000
+  },
+  {
+    "port": "Gangavaram",
+    "max_draft": 18.0,
+    "max_LOA": 300,
+    "max_beam": 45,
+    "cargo_handling_rate": 40000
+  },
+  {
+    "port": "Gopalpur",
+    "max_draft": 10.0,
+    "max_LOA": 180,
+    "max_beam": 30,
+    "cargo_handling_rate": 20000
+  },
+  {
+    "port": "Dhamra",
+    "max_draft": 16.0,
+    "max_LOA": 250,
+    "max_beam": 40,
+    "cargo_handling_rate": 35000
+  },
+  {
+    "port": "Haldia",
+    "max_draft": 10.5,
+    "max_LOA": 220,
+    "max_beam": 35,
+    "cargo_handling_rate": 25000
+  }
+]
