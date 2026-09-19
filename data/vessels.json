@@ -1,0 +1,68 @@
+[
+  {
+    "vessel_id": "VES001",
+    "vessel_name": "MV Ocean Star",
+    "vessel_type": "Supramax",
+    "location": "Paradip",
+    "capacity": 55000,
+    "draft": 12.5,
+    "LOA": 190,
+    "beam": 32,
+    "status": "available"
+  },
+  {
+    "vessel_id": "VES002",
+    "vessel_name": "MV Eastern Pearl",
+    "vessel_type": "Handysize",
+    "location": "Vizag",
+    "capacity": 35000,
+    "draft": 10.5,
+    "LOA": 175,
+    "beam": 28,
+    "status": "available"
+  },
+  {
+    "vessel_id": "VES003",
+    "vessel_name": "MV Bay Express",
+    "vessel_type": "Panamax",
+    "location": "Dhamra",
+    "capacity": 75000,
+    "draft": 13.5,
+    "LOA": 225,
+    "beam": 32,
+    "status": "available"
+  },
+  {
+    "vessel_id": "VES004",
+    "vessel_name": "MV Coastal Giant",
+    "vessel_type": "Capesize",
+    "location": "Gangavaram",
+    "capacity": 150000,
+    "draft": 17.0,
+    "LOA": 290,
+    "beam": 45,
+    "status": "available"
+  },
+  {
+    "vessel_id": "VES005",
+    "vessel_name": "MV Odisha Trader",
+    "vessel_type": "Supramax",
+    "location": "Haldia",
+    "capacity": 52000,
+    "draft": 12.0,
+    "LOA": 185,
+    "beam": 31,
+    "status": "maintenance"
+  },
+  {
+    "vessel_id": "VES006",
+    "vessel_name": "MV Gopalpur Wind",
+    "vessel_type": "Handysize",
+    "location": "Gopalpur",
+    "capacity": 30000,
+    "draft": 9.5,
+    "LOA": 165,
+    "beam": 27,
+    "status": "available"
+  }
+]

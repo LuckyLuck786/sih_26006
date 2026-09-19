@@ -1,0 +1,77 @@
+[
+  {
+    "origin": "Paradip",
+    "destination": "Vizag",
+    "distance": 320
+  },
+  {
+    "origin": "Paradip",
+    "destination": "Gangavaram",
+    "distance": 350
+  },
+  {
+    "origin": "Paradip",
+    "destination": "Gopalpur",
+    "distance": 180
+  },
+  {
+    "origin": "Paradip",
+    "destination": "Dhamra",
+    "distance": 120
+  },
+  {
+    "origin": "Paradip",
+    "destination": "Haldia",
+    "distance": 220
+  },
+  {
+    "origin": "Vizag",
+    "destination": "Gangavaram",
+    "distance": 40
+  },
+  {
+    "origin": "Vizag",
+    "destination": "Gopalpur",
+    "distance": 250
+  },
+  {
+    "origin": "Vizag",
+    "destination": "Dhamra",
+    "distance": 400
+  },
+  {
+    "origin": "Vizag",
+    "destination": "Haldia",
+    "distance": 500
+  },
+  {
+    "origin": "Gangavaram",
+    "destination": "Gopalpur",
+    "distance": 210
+  },
+  {
+    "origin": "Gangavaram",
+    "destination": "Dhamra",
+    "distance": 360
+  },
+  {
+    "origin": "Gangavaram",
+    "destination": "Haldia",
+    "distance": 460
+  },
+  {
+    "origin": "Gopalpur",
+    "destination": "Dhamra",
+    "distance": 200
+  },
+  {
+    "origin": "Gopalpur",
+    "destination": "Haldia",
+    "distance": 300
+  },
+  {
+    "origin": "Dhamra",
+    "destination": "Haldia",
+    "distance": 180
+  }
+]
