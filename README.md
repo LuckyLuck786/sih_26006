@@ -4,6 +4,7 @@
 *Intelligent freight forecasting for vessel chartering and bulk cargo procurement to the East Coast of India*
 
 **Live dashboard:** https://sih-prototype-seven-psi.vercel.app
+**Repository:** https://github.com/LuckyLuck786/sih_26006
 
 ---
 
