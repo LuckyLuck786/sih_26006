@@ -5,14 +5,9 @@ import os
 def load_ais_data():
     """Load simulated AIS data from ais.json."""
 
-    file_path = os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "data",
-        "ais.json"
-    )
+    file_path = os.path.join(os.path.dirname(__file__), "..", "data", "ais.json")
 
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         return json.load(file)
 
 

@@ -22,17 +22,14 @@ import os
 
 import joblib
 import numpy as np
-import pandas as pd
 
 from ml.preprocessing.preprocess import (
     FORECAST_HORIZON_DAYS,
-    SERIES_KEYS,
     clean_data,
     create_features,
     encode_features,
     load_data,
 )
-
 
 MODEL_DIR = "ml/models"
 
@@ -114,8 +111,7 @@ def _lane_history(origin_country, destination, vessel_type):
     # the class alone, so an unseen pairing still returns something
     # grounded in real history rather than a constant.
     relaxed = history[
-        (history["origin"] == origin_country)
-        & (history["vessel_type"] == vessel_type)
+        (history["origin"] == origin_country) & (history["vessel_type"] == vessel_type)
     ]
 
     if len(relaxed):
@@ -137,17 +133,13 @@ def forecast_lane(origin_country, destination, vessel_type, horizon_days=None):
     lane = _lane_history(origin_country, destination, vessel_type)
 
     if lane.empty:
-        raise ValueError(
-            f"No history for {origin_country} -> {destination} ({vessel_type})"
-        )
+        raise ValueError(f"No history for {origin_country} -> {destination} ({vessel_type})")
 
     latest = lane.iloc[[-1]]
 
     current_rate = float(latest["freight_rate"].iloc[0])
 
-    recent_volatility = float(
-        lane["freight_rate"].tail(30).std() or current_rate * 0.05
-    )
+    recent_volatility = float(lane["freight_rate"].tail(30).std() or current_rate * 0.05)
 
     congestion = float(latest["congestion"].iloc[0])
     vessel_supply = int(latest["vessel_supply"].iloc[0])
@@ -189,7 +181,6 @@ def forecast_lane(origin_country, destination, vessel_type, horizon_days=None):
     half_band_at_horizon = max((q90 - q10) / 2.0, 1e-9)
 
     for day in range(horizon_days + 1):
-
         progress = day / horizon_days if horizon_days else 1.0
 
         expected = current_rate + (q50 - current_rate) * progress
@@ -197,12 +188,14 @@ def forecast_lane(origin_country, destination, vessel_type, horizon_days=None):
         # Uncertainty grows with the square root of elapsed time.
         half_band = half_band_at_horizon * np.sqrt(progress)
 
-        series.append({
-            "day": day,
-            "expected": round(expected, 2),
-            "lower": round(max(expected - half_band, 0.0), 2),
-            "upper": round(expected + half_band, 2),
-        })
+        series.append(
+            {
+                "day": day,
+                "expected": round(expected, 2),
+                "lower": round(max(expected - half_band, 0.0), 2),
+                "upper": round(expected + half_band, 2),
+            }
+        )
 
     return {
         "current_rate": round(current_rate, 2),
@@ -215,21 +208,18 @@ def forecast_lane(origin_country, destination, vessel_type, horizon_days=None):
         "congestion": round(congestion, 3),
         "vessel_supply": vessel_supply,
         "source": source,
-        "lane_rows": int(len(lane)),
+        "lane_rows": len(lane),
     }
 
 
-def rate_by_vessel_class(origin_country, destination, vessel_classes,
-                         horizon_days=None):
+def rate_by_vessel_class(origin_country, destination, vessel_classes, horizon_days=None):
     """Expected rate per tonne for every class, used to rank them."""
 
     rates = {}
 
     for spec in vessel_classes:
         try:
-            forecast = forecast_lane(
-                origin_country, destination, spec["vessel_type"], horizon_days
-            )
+            forecast = forecast_lane(origin_country, destination, spec["vessel_type"], horizon_days)
             rates[spec["vessel_type"]] = forecast["expected"]
         except ValueError:
             continue
@@ -241,19 +231,19 @@ def rate_by_vessel_class(origin_country, destination, vessel_classes,
 
 
 if __name__ == "__main__":
-
     result = forecast_lane("Australia", "Paradip", "Panamax")
 
     print("Australia -> Paradip, Panamax")
     print(f"  source          : {result['source']}")
     print(f"  history rows    : {result['lane_rows']:,}")
     print(f"  current rate    : ${result['current_rate']}/t")
-    print(f"  Q10 / Q50 / Q90 : ${result['best']} / ${result['expected']} "
-          f"/ ${result['worst']}")
+    print(f"  Q10 / Q50 / Q90 : ${result['best']} / ${result['expected']} / ${result['worst']}")
     print(f"  congestion      : {result['congestion']}")
     print(f"  series points   : {len(result['series'])}")
 
     metrics = load_metrics()
     if metrics:
-        print(f"\n  backtest MAE    : ${metrics['model_mae']}/t "
-              f"({metrics['improvement_vs_naive_pct']}% better than naive)")
+        print(
+            f"\n  backtest MAE    : ${metrics['model_mae']}/t "
+            f"({metrics['improvement_vs_naive_pct']}% better than naive)"
+        )

@@ -1,0 +1,67 @@
+[project]
+name = "harborline"
+version = "2.0.0"
+description = "Freight forecasting and charter decision support for bulk cargo procurement to the East Coast of India (SIH PS 26006)."
+requires-python = ">=3.10"
+
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "scikit-learn>=1.5",
+    "lightgbm>=4.3",
+    "joblib>=1.4",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "pydantic>=2.8",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+harborline = "main:main"
+
+[tool.setuptools]
+packages = ["ml", "src", "backend"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-q --strict-markers --strict-config"
+markers = [
+    "slow: touches the trained models or the full dataset",
+]
+filterwarnings = ["error::DeprecationWarning:ml.*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = [".venv", "frontend", "ml/models"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # import sorting
+    "UP",   # pyupgrade
+    "B",    # bugbear
+    "SIM",  # simplify
+    "RUF",
+]
+ignore = [
+    "E501",    # line length handled by the formatter
+    "B008",    # FastAPI dependency defaults use calls in argument defaults
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Demo blocks in __main__ guards print by design.
+"ml/**/__main__.py" = ["T201"]
+"tests/**" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ml", "src", "backend"]

@@ -112,6 +112,13 @@ VITE_API_BASE_URL=http://localhost:8000
 > **macOS:** LightGBM needs the OpenMP runtime Apple does not ship.
 > If `import lightgbm` fails, run `brew install libomp`.
 
+### Command line
+
+```bash
+python main.py --origin Australia --destination Haldia --quantity 120000
+python main.py --origin Indonesia --destination Vizag --json
+```
+
 ### Regenerating data and models
 
 ```bash
@@ -119,6 +126,31 @@ python data/generate_reference_data.py   # ports, routes, fleet, rate history
 python -m ml.forecasting.train           # retrain quantile models
 python -m ml.export_frontend_data        # export forecasts for the browser
 ```
+
+---
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+
+pytest                    # 117 tests
+pytest -m "not slow"      # skip the ones that load the trained models
+ruff check . && ruff format --check .
+
+cd frontend
+npm run lint
+npm run format:check
+npm run build
+```
+
+CI runs all of the above on every push, plus a secret scan that fails the
+build if a 32-character API key is ever committed.
+
+Tests pin the behaviour of the bugs that were fixed: cross-lane feature
+leakage in the preprocessor, the inverted waiting-cost term and the
+unreachable day zero in the optimal-stopping model, and the draft-limited
+payload arithmetic that decides vessel class.
 
 ---
 
@@ -149,6 +181,7 @@ Maps use **OpenStreetMap** tiles, which need no key or account.
 ## Layout
 
 ```
+main.py           CLI entry point
 backend/          FastAPI service (POST /forecast)
 data/             Reference data + reproducible generator
 ml/
@@ -156,8 +189,11 @@ ml/
   decision/       Vessel optimiser, optimal stopping, idle, contracts
   risk/           Early-warning engine
   pipeline.py     Orchestrates every stage
+src/              Vessel availability, port compatibility, routing
+tests/            pytest suite
 frontend/
   api/            Serverless AIS proxy (keeps the key server-side)
   src/engine/     Browser mirror of the Python decision math
   src/components/ One panel per PS requirement
+  src/lib/        Formatting helpers and form defaults
 ```

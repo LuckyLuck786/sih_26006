@@ -68,7 +68,7 @@ def compare_spot_vs_term(
     # forecast at each fixture date.
     fixture_days = [
         min(
-            int(round(i * contract_days / max(voyages_required, 1))),
+            round(i * contract_days / max(voyages_required, 1)),
             len(series) - 1,
         )
         for i in range(max(voyages_required, 1))
@@ -117,7 +117,6 @@ def compare_spot_vs_term(
     spot_totals = np.zeros(simulations)
 
     for index, day in enumerate(fixture_days):
-
         horizon_scale = math.sqrt((day + 1) / max(len(series), 1))
 
         systematic = market_shock * systematic_sigma * horizon_scale
@@ -156,10 +155,7 @@ def compare_spot_vs_term(
     # The spot programme is penalised for its dispersion.
     # ------------------------------------------------------
 
-    spot_risk_adjusted = (
-        (1.0 - risk_aversion) * expected_spot_cost
-        + risk_aversion * spot_cvar_cost
-    )
+    spot_risk_adjusted = (1.0 - risk_aversion) * expected_spot_cost + risk_aversion * spot_cvar_cost
 
     probability_term_cheaper = float(np.mean(spot_totals > term_total_cost))
 
@@ -203,12 +199,10 @@ def compare_spot_vs_term(
 
 
 if __name__ == "__main__":
-
     # A gently falling forecast over 60 days.
     series = [30.0 - 0.03 * d for d in range(60)]
 
     for days, voyages in [(30, 2), (90, 5), (180, 9)]:
-
         result = compare_spot_vs_term(
             forecast_series=series,
             current_rate=30.0,
@@ -222,8 +216,10 @@ if __name__ == "__main__":
         print(f"{days}-day horizon, {voyages} voyages, 300,000 t")
         print("=" * 62)
         print(f"  recommendation : {result['recommendation']}")
-        print(f"  term rate      : ${result['term_rate_per_tonne']}/t "
-              f"(+{result['term_premium_pct']}%)")
+        print(
+            f"  term rate      : ${result['term_rate_per_tonne']}/t "
+            f"(+{result['term_premium_pct']}%)"
+        )
         print(f"  term total     : ${result['term_total_cost_usd']:,}")
         print(f"  spot expected  : ${result['spot_expected_cost_usd']:,}")
         print(f"  spot worst(P90): ${result['spot_worst_case_usd']:,}")

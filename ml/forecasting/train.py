@@ -20,13 +20,10 @@ import os
 
 import joblib
 import numpy as np
-import pandas as pd
-
 from sklearn.metrics import mean_absolute_error
 
-from ml.preprocessing.preprocess import preprocess_data
 from ml.forecasting.quantile_forecast import QuantileForecastModel
-
+from ml.preprocessing.preprocess import preprocess_data
 
 MODEL_DIR = "ml/models"
 
@@ -43,9 +40,7 @@ def pinball_loss(y_true, y_pred, quantile):
 
     delta = np.asarray(y_true) - np.asarray(y_pred)
 
-    return float(
-        np.mean(np.maximum(quantile * delta, (quantile - 1) * delta))
-    )
+    return float(np.mean(np.maximum(quantile * delta, (quantile - 1) * delta)))
 
 
 def train_models():
@@ -104,13 +99,12 @@ def train_models():
     inside = np.mean((y_test >= q10) & (y_test <= q90))
 
     metrics = {
-        "rows_train": int(len(X_train)),
-        "rows_test": int(len(X_test)),
+        "rows_train": len(X_train),
+        "rows_test": len(X_test),
         "cutoff_date": str(cutoff.date()),
         "features": int(X.shape[1]),
         "series_count": int(
-            processed[[c for c in processed.columns if c.startswith("vessel_type_")]]
-            .shape[1]
+            processed[[c for c in processed.columns if c.startswith("vessel_type_")]].shape[1]
         ),
         "model_mae": round(float(model_mae), 4),
         "naive_mae": round(float(naive_mae), 4),
@@ -127,10 +121,11 @@ def train_models():
     print(f"\n  Model MAE           : ${metrics['model_mae']}/t")
     print(f"  Naive MAE           : ${metrics['naive_mae']}/t")
     print(f"  Improvement         : {metrics['improvement_vs_naive_pct']}%")
-    print(f"  Q10-Q90 coverage    : {metrics['interval_coverage_q10_q90']:.1%}"
-          f"  (target ~80%)")
-    print(f"  Pinball q10/q50/q90 : {metrics['pinball_q10']} / "
-          f"{metrics['pinball_q50']} / {metrics['pinball_q90']}")
+    print(f"  Q10-Q90 coverage    : {metrics['interval_coverage_q10_q90']:.1%}  (target ~80%)")
+    print(
+        f"  Pinball q10/q50/q90 : {metrics['pinball_q10']} / "
+        f"{metrics['pinball_q50']} / {metrics['pinball_q90']}"
+    )
 
     # ----------------------------------------------------------
     # Persist
@@ -150,7 +145,7 @@ def train_models():
     # Feature importance makes the forecast defensible rather than a
     # black box, which the problem statement explicitly asks for.
     importance = sorted(
-        zip(X.columns, model.models["q50"].feature_importances_),
+        zip(X.columns, model.models["q50"].feature_importances_, strict=True),
         key=lambda pair: pair[1],
         reverse=True,
     )[:15]

@@ -1,4 +1,5 @@
-import { money, rate, tonnes, percent, Panel, Pill } from './ui'
+import { money, rate, tonnes, percent } from '../lib/format'
+import { Panel, Pill } from './ui'
 
 /**
  * PS 26006 requirement (b): vessel type optimisation.
@@ -12,8 +13,13 @@ import { money, rate, tonnes, percent, Panel, Pill } from './ui'
 export default function VesselRanking({ recommendation, route }) {
   if (!recommendation) return null
 
-  const { ranked = [], rejected = [], chosen, saving_vs_next_best_usd: saving, user_choice_infeasible: infeasible } =
-    recommendation
+  const {
+    ranked = [],
+    rejected = [],
+    chosen,
+    saving_vs_next_best_usd: saving,
+    user_choice_infeasible: infeasible,
+  } = recommendation
 
   return (
     <Panel
@@ -24,12 +30,16 @@ export default function VesselRanking({ recommendation, route }) {
           ? `${route.load_port} (${route.load_port_unlocode}) → ${route.discharge_port} (${route.discharge_port_unlocode}) · ${route.distance_nm?.toLocaleString()} nm`
           : undefined
       }
-      right={saving ? <Pill tone="bg-emerald-100 text-emerald-800">{money(saving)} vs next best</Pill> : null}
+      right={
+        saving ? (
+          <Pill tone="bg-emerald-100 text-emerald-800">{money(saving)} vs next best</Pill>
+        ) : null
+      }
     >
       {infeasible && (
         <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
-          <strong>{infeasible.vessel_type} cannot serve this lane.</strong> {infeasible.reasons?.[0]}. Showing
-          the optimiser's choice instead.
+          <strong>{infeasible.vessel_type} cannot serve this lane.</strong>{' '}
+          {infeasible.reasons?.[0]}. Showing the optimiser's choice instead.
         </div>
       )}
 
@@ -58,7 +68,9 @@ export default function VesselRanking({ recommendation, route }) {
                   <td className="py-2.5 pr-3 font-bold text-slate-400">{option.rank}</td>
                   <td className="py-2.5 pr-3">
                     <span className="font-bold text-slate-900">{option.vessel_type}</span>
-                    {isChosen && <span className="ml-2 text-[10px] font-bold text-teal-700">PICKED</span>}
+                    {isChosen && (
+                      <span className="ml-2 text-[10px] font-bold text-teal-700">PICKED</span>
+                    )}
                     <span className="block text-[11px] text-slate-400">
                       {option.dwt.toLocaleString()} dwt
                     </span>
@@ -72,9 +84,15 @@ export default function VesselRanking({ recommendation, route }) {
                   <td className="py-2.5 pr-3 text-right text-slate-700">
                     {percent(option.payload_utilisation)}
                   </td>
-                  <td className="py-2.5 pr-3 text-right text-slate-700">{option.voyages_required}</td>
-                  <td className="py-2.5 pr-3 text-right text-slate-700">{option.round_trip_days} d</td>
-                  <td className="py-2.5 text-right text-slate-700">{money(option.total_cost_usd)}</td>
+                  <td className="py-2.5 pr-3 text-right text-slate-700">
+                    {option.voyages_required}
+                  </td>
+                  <td className="py-2.5 pr-3 text-right text-slate-700">
+                    {option.round_trip_days} d
+                  </td>
+                  <td className="py-2.5 text-right text-slate-700">
+                    {money(option.total_cost_usd)}
+                  </td>
                 </tr>
               )
             })}

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, CircleMarker, Polyline, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
-import { Panel, Pill, tonnes } from './ui'
+import { tonnes } from '../lib/format'
+import { Panel, Pill } from './ui'
 import { fetchNearbyVessels } from '../services/api'
 
 /**

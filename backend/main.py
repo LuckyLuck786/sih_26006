@@ -20,7 +20,6 @@ every request using the simulated fleet, and says which it used.
 """
 
 import os
-from typing import Optional
 
 import httpx
 from fastapi import FastAPI, HTTPException
@@ -61,8 +60,8 @@ class ShipmentRequest(BaseModel):
     origin: str = Field(..., description="Origin country or load port")
     destination: str = Field(..., description="East Coast India discharge port")
     cargo_quantity: float = Field(50000, gt=0, description="Tonnes")
-    cargo_type: Optional[str] = Field(None, description="Coal, Iron Ore, ...")
-    vessel_class: Optional[str] = Field(
+    cargo_type: str | None = Field(None, description="Coal, Iron Ore, ...")
+    vessel_class: str | None = Field(
         None, description="Optional preferred class; the optimiser picks if omitted"
     )
     contract_duration: int = Field(30, gt=0, description="Days")
@@ -95,12 +94,8 @@ def reference():
     return {
         "ports": data["ports"],
         "vessel_classes": data["vessel_classes"],
-        "origins": sorted(
-            {p["country"] for p in data["ports"] if p["role"] == "load"}
-        ),
-        "destinations": [
-            p["port"] for p in data["ports"] if p["role"] == "discharge"
-        ],
+        "origins": sorted({p["country"] for p in data["ports"] if p["role"] == "load"}),
+        "destinations": [p["port"] for p in data["ports"] if p["role"] == "discharge"],
         "vessels": data["vessels"],
     }
 
@@ -125,12 +120,11 @@ def forecast(request: ShipmentRequest):
             vessel_type=request.vessel_class,
         )
     except ValueError as error:
-        raise HTTPException(status_code=422, detail=str(error))
+        raise HTTPException(status_code=422, detail=str(error)) from error
 
 
 @app.get("/ais/vessels-by-area")
-async def vessels_by_area(latitude: float, longitude: float,
-                          circle_radius: int = 50):
+async def vessels_by_area(latitude: float, longitude: float, circle_radius: int = 50):
     """
     Live AIS positions near a point, proxied from Data Docked.
 
@@ -140,8 +134,7 @@ async def vessels_by_area(latitude: float, longitude: float,
     """
 
     if not DATADOCKED_API_KEY:
-        return {"source": "simulated", "reason": "no_api_key",
-                "vessels": _simulated_fleet()}
+        return {"source": "simulated", "reason": "no_api_key", "vessels": _simulated_fleet()}
 
     try:
         async with httpx.AsyncClient(timeout=12.0) as client:
@@ -159,15 +152,20 @@ async def vessels_by_area(latitude: float, longitude: float,
             )
 
         if response.status_code != 200:
-            return {"source": "simulated",
-                    "reason": f"upstream_{response.status_code}",
-                    "vessels": _simulated_fleet()}
+            return {
+                "source": "simulated",
+                "reason": f"upstream_{response.status_code}",
+                "vessels": _simulated_fleet(),
+            }
 
         return {"source": "live", "vessels": response.json()}
 
     except (httpx.HTTPError, ValueError) as error:
-        return {"source": "simulated", "reason": type(error).__name__,
-                "vessels": _simulated_fleet()}
+        return {
+            "source": "simulated",
+            "reason": type(error).__name__,
+            "vessels": _simulated_fleet(),
+        }
 
 
 @app.get("/ais/credits")
@@ -180,8 +178,7 @@ async def credits():
     async with httpx.AsyncClient(timeout=12.0) as client:
         response = await client.get(
             f"{DATADOCKED_BASE}/my-credits",
-            headers={"accept": "application/json",
-                     "x-api-key": DATADOCKED_API_KEY},
+            headers={"accept": "application/json", "x-api-key": DATADOCKED_API_KEY},
         )
 
     return response.json()

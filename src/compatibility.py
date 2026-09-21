@@ -5,14 +5,9 @@ import os
 def load_ports():
     """Load port data from ports.json."""
 
-    file_path = os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "data",
-        "ports.json"
-    )
+    file_path = os.path.join(os.path.dirname(__file__), "..", "data", "ports.json")
 
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         return json.load(file)
 
 
@@ -37,20 +32,14 @@ def check_port_compatibility(vessel, port_name):
     port = get_port(port_name)
 
     if port is None:
-        return {
-            "valid": False,
-            "reason": "Port not found"
-        }
+        return {"valid": False, "reason": "Port not found"}
 
     draft_ok = vessel["draft"] <= port["max_draft"]
     loa_ok = vessel["LOA"] <= port["max_LOA"]
     beam_ok = vessel["beam"] <= port["max_beam"]
 
     if draft_ok and loa_ok and beam_ok:
-        return {
-            "valid": True,
-            "reason": "Vessel is compatible with port"
-        }
+        return {"valid": True, "reason": "Vessel is compatible with port"}
 
     reasons = []
 
@@ -63,7 +52,4 @@ def check_port_compatibility(vessel, port_name):
     if not beam_ok:
         reasons.append("Beam exceeds port limit")
 
-    return {
-        "valid": False,
-        "reason": ", ".join(reasons)
-    }
+    return {"valid": False, "reason": ", ".join(reasons)}

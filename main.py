@@ -1,119 +1,159 @@
+"""Command-line entry point for the Harborline charter decision engine.
+
+Runs the full pipeline for a single shipment enquiry and prints the
+result as a report or as JSON.
+
+Examples
+--------
+    python main.py --origin Australia --destination Paradip --quantity 120000
+    python main.py --origin Indonesia --destination Haldia --json
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import logging
 import sys
-import os
 
-# Add the src folder to Python's search path
-src_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
-sys.path.insert(0, src_path)
-
-from scr.availability import get_available_vessels
-from scr.recommender import recommend_vessel
-from scr.ais import get_vessel_position
+from ml import pipeline
 
 
-def main():
-
-    # Example shipment request
-    origin = "Paradip"
-    destination = "Vizag"
-    vessel_type = "Supramax"
-
-    print("=" * 50)
-    print("VESSEL & ROUTE MODULE")
-    print("=" * 50)
-
-    print("\nShipment Request")
-    print("Origin:", origin)
-    print("Destination:", destination)
-    print("Vessel Type:", vessel_type)
-
-    # Step 1: Find available vessels
-    vessels = get_available_vessels(
-        origin,
-        destination,
-        vessel_type
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="harborline",
+        description="Freight forecasting and charter decision support (SIH PS 26006).",
     )
 
-    print("\nAvailable Vessels:")
-
-    if not vessels:
-        print("No vessels available.")
-    else:
-        for vessel in vessels:
-            print(
-                f"- {vessel['vessel']} | "
-                f"{vessel['type']} | "
-                f"{vessel['distance']} km | "
-                f"Available: {vessel['available']}"
-            )
-
-    # Step 2: Recommend compatible vessel
-    recommendation = recommend_vessel(
-        origin,
-        destination,
-        vessel_type
+    parser.add_argument(
+        "--origin",
+        default="Australia",
+        help="Origin country or load port (default: Australia)",
     )
+    parser.add_argument(
+        "--destination",
+        default="Paradip",
+        help="East Coast India discharge port (default: Paradip)",
+    )
+    parser.add_argument(
+        "--quantity",
+        type=float,
+        default=120_000,
+        help="Cargo parcel size in tonnes (default: 120000)",
+    )
+    parser.add_argument(
+        "--vessel-class",
+        default=None,
+        choices=["Handysize", "Supramax", "Panamax", "Capesize"],
+        help="Preferred class. Omit to let the optimiser choose.",
+    )
+    parser.add_argument(
+        "--contract-days",
+        type=int,
+        default=90,
+        help="Contract duration in days, drives spot vs term (default: 90)",
+    )
+    parser.add_argument(
+        "--cargo-value",
+        type=float,
+        default=9_500.0,
+        help="Cargo value per tonne, drives waiting cost (default: 9500)",
+    )
+    parser.add_argument("--json", action="store_true", help="Emit raw JSON")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Debug logging")
 
-    print("\nRecommendation:")
+    return parser
 
-    if recommendation["recommended"]:
 
-        print("Vessel:", recommendation["vessel"])
-        print("Type:", recommendation["type"])
-        print("Distance:", recommendation["distance"], "km")
-        print("Available:", recommendation["available"])
-        print(
-            "Port Compatible:",
-            recommendation["port_compatible"]
+def format_report(result: dict) -> str:
+    """Render the pipeline result as a readable terminal report."""
+
+    route = result["route"]
+    forecast = result["forecast"]
+    timing = result["optimal_timing"]
+    vessel = result["vessel_recommendation"]["chosen"]
+    idle = result["idle"]
+    risk = result["risk"]
+    contract = result["contract_strategy"]
+
+    lines = [
+        "=" * 64,
+        "HARBORLINE CHARTER DECISION",
+        "=" * 64,
+        "",
+        f"Lane       {route['load_port']} ({route['load_port_unlocode']})"
+        f" -> {route['discharge_port']} ({route['discharge_port_unlocode']})",
+        f"Distance   {route['distance_nm']:,} nm",
+        f"Parcel     {result['request']['cargo_quantity']:,.0f} t",
+        "",
+        f"Rate now   ${forecast['current_rate']}/t",
+        f"Forecast   ${forecast['best']} / ${forecast['expected']}"
+        f" / ${forecast['worst']} per t  (Q10/Q50/Q90 @ {forecast['horizon_days']}d)",
+        "",
+        "-" * 64,
+        f"(a) Timing    {timing['decision']} - {timing['recommended_window']}",
+        f"              waiting wins in {timing['probability_waiting_wins']:.0%}"
+        f" of simulated markets",
+        f"(b) Vessel    {vessel['vessel_type']} @ ${vessel['cost_per_tonne_usd']}/t,"
+        f" {vessel['voyages_required']} voyage(s)",
+        f"              payload {vessel['max_payload_tonnes']:,} t"
+        f" ({vessel['payload_utilisation']:.0%} of dwt)",
+        f"(c) Idle      {idle['idle_days']} days"
+        f" ({idle['idle_share']:.0%} of round trip),"
+        f" demurrage ${idle['demurrage_cost_usd']:,}",
+        f"(d) Risk      {risk['overall_risk']} - {risk['alert_count']} alert(s)",
+        f"Objective     {contract['recommendation']} for {contract['contract_days']} days",
+        "-" * 64,
+    ]
+
+    rejected = result["vessel_recommendation"]["rejected"]
+    if rejected:
+        lines.append("")
+        lines.append("Excluded by port infrastructure:")
+        lines.extend(
+            f"  x {option['vessel_type']:10} {option['reasons'][0]}" for option in rejected
         )
 
-        # Step 3: Get mock AIS data
-        for vessel in vessels:
+    if risk["alerts"]:
+        lines.append("")
+        lines.append("Active warnings:")
+        lines.extend(
+            f"  [{alert['severity']:8}] {alert['title']}"
+            for alert in risk["alerts"]
+            if alert["category"] != "clear"
+        )
 
-            if vessel["vessel"] == recommendation["vessel"]:
+    return "\n".join(lines)
 
-                # Find vessel ID from vessel database
-                from scr.availability import load_vessels
 
-                all_vessels = load_vessels()
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
 
-                for vessel_data in all_vessels:
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.WARNING,
+        format="%(levelname)s %(name)s: %(message)s",
+    )
 
-                    if vessel_data["vessel_name"] == vessel["vessel"]:
+    try:
+        result = pipeline.run_decision_pipeline(
+            origin=args.origin,
+            destination=args.destination,
+            cargo_quantity=args.quantity,
+            cargo_value_per_ton=args.cargo_value,
+            contract_duration_days=args.contract_days,
+            vessel_type=args.vessel_class,
+        )
+    except ValueError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
 
-                        position = get_vessel_position(
-                            vessel_data["vessel_id"]
-                        )
-
-                        if position:
-                            print("\nMock AIS:")
-                            print(
-                                "Latitude:",
-                                position["latitude"]
-                            )
-                            print(
-                                "Longitude:",
-                                position["longitude"]
-                            )
-                            print(
-                                "Speed:",
-                                position["speed"],
-                                "knots"
-                            )
-                            print(
-                                "Heading:",
-                                position["heading"],
-                                "degrees"
-                            )
-
-                        break
-
-                break
-
+    if args.json:
+        print(json.dumps(result, indent=2, default=str))
     else:
-        print(recommendation["reason"])
+        print(format_report(result))
 
-    print("\n" + "=" * 50)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

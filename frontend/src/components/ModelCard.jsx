@@ -1,4 +1,5 @@
-import { Panel, Pill, percent } from './ui'
+import { percent } from '../lib/format'
+import { Panel, Pill } from './ui'
 
 /**
  * Model transparency panel.
@@ -46,7 +47,9 @@ export default function ModelCard({ model }) {
       subtitle={`LightGBM quantile regression · ${metrics.rows_train?.toLocaleString()} training rows, ${metrics.features} features`}
       right={
         <Pill tone={beatsNaive ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
-          {beatsNaive ? `${metrics.improvement_vs_naive_pct}% better than naive` : 'At parity with naive'}
+          {beatsNaive
+            ? `${metrics.improvement_vs_naive_pct}% better than naive`
+            : 'At parity with naive'}
         </Pill>
       }
     >
@@ -57,12 +60,16 @@ export default function ModelCard({ model }) {
           <p className="text-xs text-slate-400">mean absolute error</p>
         </div>
         <div className="rounded-xl bg-slate-50 p-3.5">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Naive baseline</p>
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+            Naive baseline
+          </p>
           <p className="mt-1 text-xl font-black text-slate-500">${metrics.naive_mae}/t</p>
           <p className="text-xs text-slate-400">&ldquo;tomorrow equals today&rdquo;</p>
         </div>
         <div className="rounded-xl bg-slate-50 p-3.5">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Band coverage</p>
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+            Band coverage
+          </p>
           <p className="mt-1 text-xl font-black text-slate-900">{percent(coverage)}</p>
           <p className="text-xs text-slate-400">of actuals inside Q10–Q90 (target 80%)</p>
         </div>
@@ -92,8 +99,8 @@ export default function ModelCard({ model }) {
       )}
 
       <p className="mt-4 text-xs leading-5 text-slate-400">
-        Held-out test set from {metrics.cutoff_date} onward ({metrics.rows_test?.toLocaleString()} rows),
-        split by date so the model never sees the future. Forecast horizon 14 days.
+        Held-out test set from {metrics.cutoff_date} onward ({metrics.rows_test?.toLocaleString()}{' '}
+        rows), split by date so the model never sees the future. Forecast horizon 14 days.
       </p>
     </Panel>
   )

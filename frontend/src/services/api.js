@@ -37,9 +37,13 @@ export async function analyzeShipment(payload) {
     return await response.json()
   } catch (error) {
     if (error instanceof TypeError) {
-      throw new Error('Unable to reach the forecast service. Check that the API is running.')
+      throw new Error('Unable to reach the forecast service. Check that the API is running.', {
+        cause: error,
+      })
     }
-    throw new Error(error.message || 'The forecast service returned an unexpected error.')
+    throw new Error(error.message || 'The forecast service returned an unexpected error.', {
+      cause: error,
+    })
   }
 }
 

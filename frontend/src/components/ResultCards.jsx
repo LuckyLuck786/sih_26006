@@ -1,4 +1,5 @@
-import { money, rate, percent, Pill } from './ui'
+import { money, rate, percent } from '../lib/format'
+import { Pill } from './ui'
 
 function Card({ label, children }) {
   return (
@@ -51,7 +52,9 @@ export default function ResultCards({ result }) {
       </Card>
 
       <Card label="Rate today">
-        <strong className="text-2xl font-black text-slate-900">{rate(forecast.current_rate)}</strong>
+        <strong className="text-2xl font-black text-slate-900">
+          {rate(forecast.current_rate)}
+        </strong>
         <p className="mt-2 text-xs text-slate-400">Per tonne, spot</p>
       </Card>
 
@@ -59,7 +62,9 @@ export default function ResultCards({ result }) {
         <div className={`text-2xl font-black ${net >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
           {rate(decision.expected_saving)}
         </div>
-        <p className={`mt-2 text-xs font-semibold ${net >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+        <p
+          className={`mt-2 text-xs font-semibold ${net >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
+        >
           {rate(net)} net of waiting cost
         </p>
       </Card>
@@ -74,13 +79,17 @@ export default function ResultCards({ result }) {
             style={{ width: `${(confidence || 0) * 100}%` }}
           />
         </div>
-        <p className="mt-2 text-xs text-slate-400">Narrower forecast band means higher confidence</p>
+        <p className="mt-2 text-xs text-slate-400">
+          Narrower forecast band means higher confidence
+        </p>
       </Card>
 
       <Card label="Risk level">
         <Pill tone={riskTone}>{risk}</Pill>
         <p className="mt-3 text-xs text-slate-400">
-          {result?.risk?.alert_count ? `${result.risk.alert_count} active warning(s)` : 'No active warnings'}
+          {result?.risk?.alert_count
+            ? `${result.risk.alert_count} active warning(s)`
+            : 'No active warnings'}
         </p>
       </Card>
 
@@ -89,26 +98,38 @@ export default function ResultCards({ result }) {
           {mc.probability_rate_decrease === undefined ? '—' : percent(mc.probability_rate_decrease)}
         </strong>
         <p className="mt-2 text-xs text-slate-400">
-          {mc.simulations ? `${mc.simulations.toLocaleString()} Monte Carlo paths` : 'Simulation pending'}
+          {mc.simulations
+            ? `${mc.simulations.toLocaleString()} Monte Carlo paths`
+            : 'Simulation pending'}
         </p>
       </Card>
 
       <Card label="Recommended class">
-        <strong className="block text-lg font-black text-slate-900">{chosen.vessel_type || '—'}</strong>
+        <strong className="block text-lg font-black text-slate-900">
+          {chosen.vessel_type || '—'}
+        </strong>
         <p className="mt-1 text-sm text-slate-500">
-          {chosen.cost_per_tonne_usd ? `${rate(chosen.cost_per_tonne_usd)} all-in per tonne` : 'Pending'}
+          {chosen.cost_per_tonne_usd
+            ? `${rate(chosen.cost_per_tonne_usd)} all-in per tonne`
+            : 'Pending'}
         </p>
       </Card>
 
       <Card label="Voyages required">
-        <strong className="text-2xl font-black text-slate-900">{chosen.voyages_required ?? '—'}</strong>
+        <strong className="text-2xl font-black text-slate-900">
+          {chosen.voyages_required ?? '—'}
+        </strong>
         <p className="mt-2 text-xs text-slate-400">
-          {chosen.tonnes_per_voyage ? `${chosen.tonnes_per_voyage.toLocaleString()} t per voyage` : ''}
+          {chosen.tonnes_per_voyage
+            ? `${chosen.tonnes_per_voyage.toLocaleString()} t per voyage`
+            : ''}
         </p>
       </Card>
 
       <Card label="Total landed cost">
-        <strong className="text-2xl font-black text-slate-900">{money(chosen.total_cost_usd)}</strong>
+        <strong className="text-2xl font-black text-slate-900">
+          {money(chosen.total_cost_usd)}
+        </strong>
         <p className="mt-2 text-xs text-slate-400">Freight, hire, bunkers and port charges</p>
       </Card>
     </div>

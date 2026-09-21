@@ -14,19 +14,15 @@ def create_quantile_model(alpha):
     model = lgb.LGBMRegressor(
         objective="quantile",
         alpha=alpha,
-
         n_estimators=200,
         learning_rate=0.05,
         num_leaves=15,
-
         max_depth=-1,
         min_child_samples=10,
-
         subsample=0.8,
         colsample_bytree=0.8,
-
         random_state=42,
-        verbosity=-1
+        verbosity=-1,
     )
 
     return model

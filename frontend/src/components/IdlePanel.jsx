@@ -1,4 +1,5 @@
-import { money, percent, Panel, Stat, Pill, SEVERITY_DOT } from './ui'
+import { money, percent, SEVERITY_DOT } from '../lib/format'
+import { Panel, Stat, Pill } from './ui'
 
 /**
  * PS 26006 requirement (c): idle scenario management.
@@ -14,7 +15,12 @@ export default function IdlePanel({ idle }) {
     { label: 'Loading', value: idle.load_days, tone: 'bg-teal-400', earning: true },
     { label: 'Discharge', value: idle.discharge_days, tone: 'bg-teal-300', earning: true },
     { label: 'Ballast', value: idle.ballast_days, tone: 'bg-slate-400', earning: false },
-    { label: 'Berth wait', value: (idle.load_berth_wait_days || 0) + (idle.discharge_berth_wait_days || 0), tone: 'bg-amber-400', earning: false },
+    {
+      label: 'Berth wait',
+      value: (idle.load_berth_wait_days || 0) + (idle.discharge_berth_wait_days || 0),
+      tone: 'bg-amber-400',
+      earning: false,
+    },
   ].filter((s) => s.value > 0)
 
   const total = idle.total_round_trip_days || 1
@@ -25,7 +31,13 @@ export default function IdlePanel({ idle }) {
       title={`${idle.idle_days} idle days per round trip`}
       subtitle="Where the non-earning time goes, and what to do about it"
       right={
-        <Pill tone={idle.idle_share > 0.45 ? 'bg-orange-100 text-orange-800' : 'bg-emerald-100 text-emerald-800'}>
+        <Pill
+          tone={
+            idle.idle_share > 0.45
+              ? 'bg-orange-100 text-orange-800'
+              : 'bg-emerald-100 text-emerald-800'
+          }
+        >
           {percent(idle.idle_share)} non-earning
         </Pill>
       }
@@ -43,7 +55,10 @@ export default function IdlePanel({ idle }) {
 
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
         {segments.map((segment) => (
-          <span key={segment.label} className="flex items-center gap-1.5 text-[11px] text-slate-600">
+          <span
+            key={segment.label}
+            className="flex items-center gap-1.5 text-[11px] text-slate-600"
+          >
             <span className={`h-2.5 w-2.5 rounded-sm ${segment.tone}`} />
             {segment.label} {segment.value.toFixed(1)}d
             {!segment.earning && <span className="text-slate-400">(idle)</span>}
@@ -52,7 +67,11 @@ export default function IdlePanel({ idle }) {
       </div>
 
       <div className="mt-6 grid gap-5 sm:grid-cols-3">
-        <Stat label="Round trip" value={`${idle.total_round_trip_days} d`} hint="port to port and back" />
+        <Stat
+          label="Round trip"
+          value={`${idle.total_round_trip_days} d`}
+          hint="port to port and back"
+        />
         <Stat
           label="Berth queue"
           value={`${idle.discharge_berth_wait_days} d`}
@@ -71,7 +90,9 @@ export default function IdlePanel({ idle }) {
         <ul className="mt-5 space-y-2 border-t border-slate-100 pt-4">
           {idle.recommendations.map((item) => (
             <li key={item.type} className="flex gap-2.5 text-xs leading-5 text-slate-700">
-              <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${SEVERITY_DOT[item.severity] || 'bg-slate-400'}`} />
+              <span
+                className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${SEVERITY_DOT[item.severity] || 'bg-slate-400'}`}
+              />
               {item.message}
             </li>
           ))}

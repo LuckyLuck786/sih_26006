@@ -5,28 +5,18 @@ import os
 def load_vessels():
     """Load vessel data from vessels.json."""
 
-    file_path = os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "data",
-        "vessels.json"
-    )
+    file_path = os.path.join(os.path.dirname(__file__), "..", "data", "vessels.json")
 
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         return json.load(file)
 
 
 def load_routes():
     """Load route data from routes.json."""
 
-    file_path = os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "data",
-        "routes.json"
-    )
+    file_path = os.path.join(os.path.dirname(__file__), "..", "data", "routes.json")
 
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         return json.load(file)
 
 
@@ -72,11 +62,13 @@ def get_available_vessels(origin, destination, vessel_type):
             and vessel["vessel_type"].lower() == vessel_type.lower()
             and vessel["status"].lower() == "available"
         ):
-            available_vessels.append({
-                "vessel": vessel["vessel_name"],
-                "type": vessel["vessel_type"],
-                "distance": distance,
-                "available": True
-            })
+            available_vessels.append(
+                {
+                    "vessel": vessel["vessel_name"],
+                    "type": vessel["vessel_type"],
+                    "distance": distance,
+                    "available": True,
+                }
+            )
 
     return available_vessels

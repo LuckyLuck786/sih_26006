@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
 import Header from './components/Header'
-import InputPanel, { initialValues } from './components/InputPanel'
+import InputPanel from './components/InputPanel'
+import { initialValues } from './lib/shipmentDefaults'
 import ResultCards from './components/ResultCards'
 import DecisionBanner from './components/DecisionBanner'
 import ForecastChart from './components/ForecastChart'
@@ -85,12 +86,7 @@ export default function App() {
         </div>
 
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(300px,1fr)_minmax(0,2.3fr)]">
-          <InputPanel
-            values={values}
-            onChange={setValues}
-            onSubmit={submit}
-            loading={loading}
-          />
+          <InputPanel values={values} onChange={setValues} onSubmit={submit} loading={loading} />
 
           <section aria-live="polite" className="min-w-0">
             {loading ? (

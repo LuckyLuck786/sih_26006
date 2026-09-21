@@ -30,7 +30,6 @@ import numpy as np
 
 
 class LongstaffSchwartz:
-
     def __init__(
         self,
         simulations=5000,
@@ -88,7 +87,6 @@ class LongstaffSchwartz:
         paths[:, 0] = current_rate
 
         for t in range(1, self.time_steps + 1):
-
             previous = paths[:, t - 1]
 
             drift = reversion * (forecast_expected - previous)
@@ -121,18 +119,19 @@ class LongstaffSchwartz:
         stopping_time = np.full(n_paths, horizon, dtype=int)
 
         for t in range(n_steps - 2, 0, -1):
-
             rates_now = paths[:, t]
 
             immediate_cost = rates_now + waiting_cost * t
 
             # Regress the realised continuation cost on the current rate
             # to estimate what waiting is worth from this state.
-            basis = np.column_stack([
-                np.ones(n_paths),
-                rates_now,
-                rates_now ** 2,
-            ])
+            basis = np.column_stack(
+                [
+                    np.ones(n_paths),
+                    rates_now,
+                    rates_now**2,
+                ]
+            )
 
             coefficients, *_ = np.linalg.lstsq(basis, values, rcond=None)
 
@@ -164,9 +163,7 @@ class LongstaffSchwartz:
             forecast_worst=forecast_worst,
         )
 
-        stopping_time, values = self.calculate_optimal_stopping(
-            paths, waiting_cost
-        )
+        stopping_time, values = self.calculate_optimal_stopping(paths, waiting_cost)
 
         # ------------------------------------------------------
         # Day zero is a decision, not a distribution: today's rate
@@ -181,9 +178,7 @@ class LongstaffSchwartz:
         charter_now = cost_if_fixed_today <= expected_cost_if_waiting
 
         # Share of simulated futures in which waiting actually paid off.
-        probability_waiting_wins = float(
-            np.mean(values < cost_if_fixed_today)
-        )
+        probability_waiting_wins = float(np.mean(values < cost_if_fixed_today))
 
         # Most frequently chosen day to fix, among paths that waited.
         day_counts = np.bincount(stopping_time, minlength=self.time_steps + 1)
@@ -217,7 +212,6 @@ class LongstaffSchwartz:
 
 
 if __name__ == "__main__":
-
     model = LongstaffSchwartz()
 
     print("=" * 62)
@@ -231,7 +225,6 @@ if __name__ == "__main__":
     ]
 
     for label, current, expected, best, worst in scenarios:
-
         result = model.run(
             current_rate=current,
             forecast_expected=expected,

@@ -12,8 +12,12 @@ Every temporal feature is therefore computed inside a groupby on the
 series key, and the target is shifted inside the same groups.
 """
 
+import logging
+
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 DATA_PATH = "data/synthetic/freight_rate.csv"
@@ -45,7 +49,7 @@ def load_data(path=DATA_PATH):
     """Load the freight-rate history."""
 
     df = pd.read_csv(path)
-    print(f"Loaded {len(df):,} rows from {path}")
+    logger.info("Loaded %s rows from %s", f"{len(df):,}", path)
     return df
 
 
@@ -56,15 +60,14 @@ def clean_data(df):
 
     df["date"] = pd.to_datetime(df["date"])
 
-    df = df.sort_values(SERIES_KEYS + ["date"]).reset_index(drop=True)
+    df = df.sort_values([*SERIES_KEYS, "date"]).reset_index(drop=True)
 
-    df = df.drop_duplicates(subset=SERIES_KEYS + ["date"]).reset_index(drop=True)
+    df = df.drop_duplicates(subset=[*SERIES_KEYS, "date"]).reset_index(drop=True)
 
     for column in NUMERIC_COLUMNS:
         if column in df.columns:
-            df[column] = (
-                df.groupby(SERIES_KEYS, observed=True)[column]
-                .transform(lambda s: s.interpolate().bfill().ffill())
+            df[column] = df.groupby(SERIES_KEYS, observed=True)[column].transform(
+                lambda s: s.interpolate().bfill().ffill()
             )
 
     for column in CATEGORICAL_COLUMNS:
@@ -114,9 +117,7 @@ def create_features(df):
     df["freight_rate_change"] = grouped.pct_change()
 
     # Momentum: where the rate sits against its own recent mean.
-    df["rate_vs_mean_7"] = (
-        df["freight_rate"] / df["freight_rate_rolling_mean_7"] - 1.0
-    )
+    df["rate_vs_mean_7"] = df["freight_rate"] / df["freight_rate_rolling_mean_7"] - 1.0
 
     # Supply and congestion carry signal of their own.
     congestion_grouped = df.groupby(SERIES_KEYS, observed=True)["congestion"]
@@ -144,27 +145,26 @@ def encode_features(df):
 def preprocess_data(path=DATA_PATH):
     """Run the full pipeline."""
 
-    print("\n1. Loading data...")
+    logger.debug("Loading data")
     df = load_data(path)
 
-    print("2. Cleaning data...")
+    logger.debug("Cleaning data")
     df = clean_data(df)
 
-    print("3. Creating features...")
+    logger.debug("Creating features")
     df = create_features(df)
 
     # The target is built before encoding so the groupby uses the real
     # key columns rather than reconstructed dummy columns.
-    df["target"] = (
-        df.groupby(SERIES_KEYS, observed=True)["freight_rate"]
-        .shift(-FORECAST_HORIZON_DAYS)
+    df["target"] = df.groupby(SERIES_KEYS, observed=True)["freight_rate"].shift(
+        -FORECAST_HORIZON_DAYS
     )
     df = df.dropna(subset=["target"]).reset_index(drop=True)
 
-    print("4. Encoding categorical features...")
+    logger.debug("Encoding categorical features")
     encoded = encode_features(df)
 
-    print("5. Preparing X and y...")
+    logger.debug("Preparing X and y")
 
     drop_columns = [c for c in ["date", "target", "origin_port"] if c in encoded.columns]
 
@@ -175,7 +175,6 @@ def preprocess_data(path=DATA_PATH):
 
 
 if __name__ == "__main__":
-
     X, y, processed = preprocess_data()
 
     print("\n" + "=" * 46)

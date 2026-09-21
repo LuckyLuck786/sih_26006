@@ -48,119 +48,233 @@ SEED = 26006  # the problem-statement id, so runs are reproducible
 PORTS = [
     # ---------- Discharge: East Coast of India (PS 26006) ----------
     {
-        "port": "Paradip", "unlocode": "INPRT", "country": "India",
-        "role": "discharge", "latitude": 20.2648, "longitude": 86.6753,
-        "max_draft": 17.1, "max_LOA": 300, "max_beam": 50,
-        "cargo_handling_rate": 35000, "berths": 4,
+        "port": "Paradip",
+        "unlocode": "INPRT",
+        "country": "India",
+        "role": "discharge",
+        "latitude": 20.2648,
+        "longitude": 86.6753,
+        "max_draft": 17.1,
+        "max_LOA": 300,
+        "max_beam": 50,
+        "cargo_handling_rate": 35000,
+        "berths": 4,
     },
     {
-        "port": "Vizag", "unlocode": "INVTZ", "country": "India",
-        "role": "discharge", "latitude": 17.6868, "longitude": 83.2185,
-        "max_draft": 16.5, "max_LOA": 300, "max_beam": 48,
-        "cargo_handling_rate": 32000, "berths": 4,
+        "port": "Vizag",
+        "unlocode": "INVTZ",
+        "country": "India",
+        "role": "discharge",
+        "latitude": 17.6868,
+        "longitude": 83.2185,
+        "max_draft": 16.5,
+        "max_LOA": 300,
+        "max_beam": 48,
+        "cargo_handling_rate": 32000,
+        "berths": 4,
     },
     {
-        "port": "Gangavaram", "unlocode": "INGGV", "country": "India",
-        "role": "discharge", "latitude": 17.6200, "longitude": 83.2400,
-        "max_draft": 21.0, "max_LOA": 330, "max_beam": 55,
-        "cargo_handling_rate": 45000, "berths": 3,
+        "port": "Gangavaram",
+        "unlocode": "INGGV",
+        "country": "India",
+        "role": "discharge",
+        "latitude": 17.6200,
+        "longitude": 83.2400,
+        "max_draft": 21.0,
+        "max_LOA": 330,
+        "max_beam": 55,
+        "cargo_handling_rate": 45000,
+        "berths": 3,
     },
     {
-        "port": "Gopalpur", "unlocode": "INGPR", "country": "India",
-        "role": "discharge", "latitude": 19.2647, "longitude": 84.9080,
-        "max_draft": 9.5, "max_LOA": 200, "max_beam": 32,
-        "cargo_handling_rate": 18000, "berths": 2,
+        "port": "Gopalpur",
+        "unlocode": "INGPR",
+        "country": "India",
+        "role": "discharge",
+        "latitude": 19.2647,
+        "longitude": 84.9080,
+        "max_draft": 9.5,
+        "max_LOA": 200,
+        "max_beam": 32,
+        "cargo_handling_rate": 18000,
+        "berths": 2,
     },
     {
-        "port": "Dhamra", "unlocode": "INDMR", "country": "India",
-        "role": "discharge", "latitude": 20.7833, "longitude": 86.9667,
-        "max_draft": 18.5, "max_LOA": 320, "max_beam": 50,
-        "cargo_handling_rate": 40000, "berths": 3,
+        "port": "Dhamra",
+        "unlocode": "INDMR",
+        "country": "India",
+        "role": "discharge",
+        "latitude": 20.7833,
+        "longitude": 86.9667,
+        "max_draft": 18.5,
+        "max_LOA": 320,
+        "max_beam": 50,
+        "cargo_handling_rate": 40000,
+        "berths": 3,
     },
     {
-        "port": "Haldia", "unlocode": "INHAL", "country": "India",
-        "role": "discharge", "latitude": 22.0333, "longitude": 88.0833,
-        "max_draft": 8.5, "max_LOA": 240, "max_beam": 32,
-        "cargo_handling_rate": 22000, "berths": 3,
+        "port": "Haldia",
+        "unlocode": "INHAL",
+        "country": "India",
+        "role": "discharge",
+        "latitude": 22.0333,
+        "longitude": 88.0833,
+        "max_draft": 8.5,
+        "max_LOA": 240,
+        "max_beam": 32,
+        "cargo_handling_rate": 22000,
+        "berths": 3,
     },
     {
         # Named explicitly in the problem statement. It is a lightering
         # anchorage rather than a berth, so handling is slower and the
         # governing restriction is the approach channel.
-        "port": "Sagar-Sandheads", "unlocode": "INSGR", "country": "India",
-        "role": "discharge", "latitude": 21.6500, "longitude": 88.0500,
-        "max_draft": 10.5, "max_LOA": 300, "max_beam": 45,
-        "cargo_handling_rate": 15000, "berths": 2,
+        "port": "Sagar-Sandheads",
+        "unlocode": "INSGR",
+        "country": "India",
+        "role": "discharge",
+        "latitude": 21.6500,
+        "longitude": 88.0500,
+        "max_draft": 10.5,
+        "max_LOA": 300,
+        "max_beam": 45,
+        "cargo_handling_rate": 15000,
+        "berths": 2,
     },
-
     # ---------- Load: Australia ----------
     {
-        "port": "Newcastle", "unlocode": "AUNTL", "country": "Australia",
-        "role": "load", "latitude": -32.9283, "longitude": 151.7817,
-        "max_draft": 16.5, "max_LOA": 300, "max_beam": 50,
-        "cargo_handling_rate": 60000, "berths": 5,
+        "port": "Newcastle",
+        "unlocode": "AUNTL",
+        "country": "Australia",
+        "role": "load",
+        "latitude": -32.9283,
+        "longitude": 151.7817,
+        "max_draft": 16.5,
+        "max_LOA": 300,
+        "max_beam": 50,
+        "cargo_handling_rate": 60000,
+        "berths": 5,
     },
     {
-        "port": "Hay Point", "unlocode": "AUHPT", "country": "Australia",
-        "role": "load", "latitude": -21.2744, "longitude": 149.3056,
-        "max_draft": 19.4, "max_LOA": 330, "max_beam": 55,
-        "cargo_handling_rate": 70000, "berths": 4,
+        "port": "Hay Point",
+        "unlocode": "AUHPT",
+        "country": "Australia",
+        "role": "load",
+        "latitude": -21.2744,
+        "longitude": 149.3056,
+        "max_draft": 19.4,
+        "max_LOA": 330,
+        "max_beam": 55,
+        "cargo_handling_rate": 70000,
+        "berths": 4,
     },
     {
-        "port": "Port Hedland", "unlocode": "AUPHE", "country": "Australia",
-        "role": "load", "latitude": -20.3100, "longitude": 118.5760,
-        "max_draft": 19.0, "max_LOA": 330, "max_beam": 55,
-        "cargo_handling_rate": 80000, "berths": 5,
+        "port": "Port Hedland",
+        "unlocode": "AUPHE",
+        "country": "Australia",
+        "role": "load",
+        "latitude": -20.3100,
+        "longitude": 118.5760,
+        "max_draft": 19.0,
+        "max_LOA": 330,
+        "max_beam": 55,
+        "cargo_handling_rate": 80000,
+        "berths": 5,
     },
-
     # ---------- Load: Indonesia ----------
     {
-        "port": "Banjarmasin", "unlocode": "IDBDJ", "country": "Indonesia",
-        "role": "load", "latitude": -3.3167, "longitude": 114.5833,
-        "max_draft": 14.0, "max_LOA": 290, "max_beam": 45,
-        "cargo_handling_rate": 30000, "berths": 3,
+        "port": "Banjarmasin",
+        "unlocode": "IDBDJ",
+        "country": "Indonesia",
+        "role": "load",
+        "latitude": -3.3167,
+        "longitude": 114.5833,
+        "max_draft": 14.0,
+        "max_LOA": 290,
+        "max_beam": 45,
+        "cargo_handling_rate": 30000,
+        "berths": 3,
     },
     {
-        "port": "Samarinda", "unlocode": "IDSMD", "country": "Indonesia",
-        "role": "load", "latitude": -0.5017, "longitude": 117.1536,
-        "max_draft": 9.0, "max_LOA": 200, "max_beam": 32,
-        "cargo_handling_rate": 20000, "berths": 2,
+        "port": "Samarinda",
+        "unlocode": "IDSMD",
+        "country": "Indonesia",
+        "role": "load",
+        "latitude": -0.5017,
+        "longitude": 117.1536,
+        "max_draft": 9.0,
+        "max_LOA": 200,
+        "max_beam": 32,
+        "cargo_handling_rate": 20000,
+        "berths": 2,
     },
-
     # ---------- Load: United States ----------
     {
-        "port": "Baltimore", "unlocode": "USBAL", "country": "United States",
-        "role": "load", "latitude": 39.2667, "longitude": -76.5833,
-        "max_draft": 15.2, "max_LOA": 300, "max_beam": 48,
-        "cargo_handling_rate": 35000, "berths": 3,
+        "port": "Baltimore",
+        "unlocode": "USBAL",
+        "country": "United States",
+        "role": "load",
+        "latitude": 39.2667,
+        "longitude": -76.5833,
+        "max_draft": 15.2,
+        "max_LOA": 300,
+        "max_beam": 48,
+        "cargo_handling_rate": 35000,
+        "berths": 3,
     },
     {
-        "port": "New Orleans", "unlocode": "USMSY", "country": "United States",
-        "role": "load", "latitude": 29.9511, "longitude": -90.0715,
-        "max_draft": 13.7, "max_LOA": 290, "max_beam": 45,
-        "cargo_handling_rate": 30000, "berths": 3,
+        "port": "New Orleans",
+        "unlocode": "USMSY",
+        "country": "United States",
+        "role": "load",
+        "latitude": 29.9511,
+        "longitude": -90.0715,
+        "max_draft": 13.7,
+        "max_LOA": 290,
+        "max_beam": 45,
+        "cargo_handling_rate": 30000,
+        "berths": 3,
     },
-
     # ---------- Load: Mozambique ----------
     {
-        "port": "Beira", "unlocode": "MZBEW", "country": "Mozambique",
-        "role": "load", "latitude": -19.8333, "longitude": 34.8333,
-        "max_draft": 12.0, "max_LOA": 250, "max_beam": 40,
-        "cargo_handling_rate": 18000, "berths": 2,
+        "port": "Beira",
+        "unlocode": "MZBEW",
+        "country": "Mozambique",
+        "role": "load",
+        "latitude": -19.8333,
+        "longitude": 34.8333,
+        "max_draft": 12.0,
+        "max_LOA": 250,
+        "max_beam": 40,
+        "cargo_handling_rate": 18000,
+        "berths": 2,
     },
     {
-        "port": "Nacala", "unlocode": "MZMNC", "country": "Mozambique",
-        "role": "load", "latitude": -14.5333, "longitude": 40.6667,
-        "max_draft": 14.0, "max_LOA": 280, "max_beam": 45,
-        "cargo_handling_rate": 22000, "berths": 2,
+        "port": "Nacala",
+        "unlocode": "MZMNC",
+        "country": "Mozambique",
+        "role": "load",
+        "latitude": -14.5333,
+        "longitude": 40.6667,
+        "max_draft": 14.0,
+        "max_LOA": 280,
+        "max_beam": 45,
+        "cargo_handling_rate": 22000,
+        "berths": 2,
     },
-
     # ---------- Load: Russia ----------
     {
-        "port": "Vostochny", "unlocode": "RUVYP", "country": "Russia",
-        "role": "load", "latitude": 42.7500, "longitude": 133.0833,
-        "max_draft": 16.5, "max_LOA": 300, "max_beam": 50,
-        "cargo_handling_rate": 40000, "berths": 3,
+        "port": "Vostochny",
+        "unlocode": "RUVYP",
+        "country": "Russia",
+        "role": "load",
+        "latitude": 42.7500,
+        "longitude": 133.0833,
+        "max_draft": 16.5,
+        "max_LOA": 300,
+        "max_beam": 50,
+        "cargo_handling_rate": 40000,
+        "berths": 3,
     },
 ]
 
@@ -175,37 +289,73 @@ PORTS = [
 
 VESSEL_CLASSES = [
     {
-        "vessel_type": "Handysize", "dwt": 28000, "draft": 10.0,
-        "LOA": 180, "beam": 28, "service_speed": 12.5,
-        "daily_hire_usd": 9500, "bunker_tonnes_per_day": 18,
+        "vessel_type": "Handysize",
+        "dwt": 28000,
+        "draft": 10.0,
+        "LOA": 180,
+        "beam": 28,
+        "service_speed": 12.5,
+        "daily_hire_usd": 9500,
+        "bunker_tonnes_per_day": 18,
     },
     {
-        "vessel_type": "Supramax", "dwt": 58000, "draft": 12.8,
-        "LOA": 200, "beam": 32, "service_speed": 13.0,
-        "daily_hire_usd": 13500, "bunker_tonnes_per_day": 24,
+        "vessel_type": "Supramax",
+        "dwt": 58000,
+        "draft": 12.8,
+        "LOA": 200,
+        "beam": 32,
+        "service_speed": 13.0,
+        "daily_hire_usd": 13500,
+        "bunker_tonnes_per_day": 24,
     },
     {
-        "vessel_type": "Panamax", "dwt": 76000, "draft": 14.2,
-        "LOA": 229, "beam": 32.3, "service_speed": 13.5,
-        "daily_hire_usd": 16000, "bunker_tonnes_per_day": 30,
+        "vessel_type": "Panamax",
+        "dwt": 76000,
+        "draft": 14.2,
+        "LOA": 229,
+        "beam": 32.3,
+        "service_speed": 13.5,
+        "daily_hire_usd": 16000,
+        "bunker_tonnes_per_day": 30,
     },
     {
-        "vessel_type": "Capesize", "dwt": 180000, "draft": 18.2,
-        "LOA": 292, "beam": 45, "service_speed": 14.0,
-        "daily_hire_usd": 24000, "bunker_tonnes_per_day": 42,
+        "vessel_type": "Capesize",
+        "dwt": 180000,
+        "draft": 18.2,
+        "LOA": 292,
+        "beam": 45,
+        "service_speed": 14.0,
+        "daily_hire_usd": 24000,
+        "bunker_tonnes_per_day": 42,
     },
 ]
 
 
 VESSEL_NAMES = [
-    "MV Ocean Star", "MV Eastern Pearl", "MV Bay Express", "MV Coastal Giant",
-    "MV Indian Trader", "MV Southern Cross", "MV Bengal Pioneer",
-    "MV Coral Horizon", "MV Kalinga Spirit", "MV Deccan Voyager",
-    "MV Andaman Dawn", "MV Konark Mariner", "MV Utkal Navigator",
-    "MV Godavari Belle", "MV Mahanadi Queen", "MV Sunda Breeze",
-    "MV Pacific Ember", "MV Zambezi Star", "MV Nusantara Sun",
-    "MV Timor Ranger", "MV Arafura Bell", "MV Chesapeake Lark",
-    "MV Volga Crest", "MV Nampula Tide",
+    "MV Ocean Star",
+    "MV Eastern Pearl",
+    "MV Bay Express",
+    "MV Coastal Giant",
+    "MV Indian Trader",
+    "MV Southern Cross",
+    "MV Bengal Pioneer",
+    "MV Coral Horizon",
+    "MV Kalinga Spirit",
+    "MV Deccan Voyager",
+    "MV Andaman Dawn",
+    "MV Konark Mariner",
+    "MV Utkal Navigator",
+    "MV Godavari Belle",
+    "MV Mahanadi Queen",
+    "MV Sunda Breeze",
+    "MV Pacific Ember",
+    "MV Zambezi Star",
+    "MV Nusantara Sun",
+    "MV Timor Ranger",
+    "MV Arafura Bell",
+    "MV Chesapeake Lark",
+    "MV Volga Crest",
+    "MV Nampula Tide",
 ]
 
 
@@ -236,23 +386,26 @@ def build_routes(ports):
 
     for load in load_ports:
         for discharge in discharge_ports:
-
             great_circle = haversine_nm(
-                load["latitude"], load["longitude"],
-                discharge["latitude"], discharge["longitude"],
+                load["latitude"],
+                load["longitude"],
+                discharge["latitude"],
+                discharge["longitude"],
             )
 
             distance = round(great_circle * ROUTING_FACTOR)
 
-            routes.append({
-                "origin": load["port"],
-                "origin_unlocode": load["unlocode"],
-                "origin_country": load["country"],
-                "destination": discharge["port"],
-                "destination_unlocode": discharge["unlocode"],
-                "distance": distance,
-                "distance_source": "great_circle_x_routing_factor",
-            })
+            routes.append(
+                {
+                    "origin": load["port"],
+                    "origin_unlocode": load["unlocode"],
+                    "origin_country": load["country"],
+                    "destination": discharge["port"],
+                    "destination_unlocode": discharge["unlocode"],
+                    "distance": distance,
+                    "distance_source": "great_circle_x_routing_factor",
+                }
+            )
 
     return routes
 
@@ -267,7 +420,6 @@ def build_fleet(ports, vessel_classes, rng):
 
     for load in load_ports:
         for spec in vessel_classes:
-
             # A port cannot host a class it physically cannot berth.
             if spec["draft"] > load["max_draft"]:
                 continue
@@ -283,22 +435,24 @@ def build_fleet(ports, vessel_classes, rng):
             # so the availability filter has something to exclude.
             status = "available" if rng.random() > 0.25 else "chartered"
 
-            fleet.append({
-                "vessel_id": f"VES{name_index + 1:03d}",
-                "vessel_name": VESSEL_NAMES[name_index],
-                "vessel_type": spec["vessel_type"],
-                "location": load["port"],
-                "location_unlocode": load["unlocode"],
-                "latitude": round(load["latitude"] + rng.uniform(-0.6, 0.6), 4),
-                "longitude": round(load["longitude"] + rng.uniform(-0.6, 0.6), 4),
-                "capacity": spec["dwt"],
-                "draft": spec["draft"],
-                "LOA": spec["LOA"],
-                "beam": spec["beam"],
-                "service_speed": spec["service_speed"],
-                "status": status,
-                "open_in_days": rng.randint(0, 9),
-            })
+            fleet.append(
+                {
+                    "vessel_id": f"VES{name_index + 1:03d}",
+                    "vessel_name": VESSEL_NAMES[name_index],
+                    "vessel_type": spec["vessel_type"],
+                    "location": load["port"],
+                    "location_unlocode": load["unlocode"],
+                    "latitude": round(load["latitude"] + rng.uniform(-0.6, 0.6), 4),
+                    "longitude": round(load["longitude"] + rng.uniform(-0.6, 0.6), 4),
+                    "capacity": spec["dwt"],
+                    "draft": spec["draft"],
+                    "LOA": spec["LOA"],
+                    "beam": spec["beam"],
+                    "service_speed": spec["service_speed"],
+                    "status": status,
+                    "open_in_days": rng.randint(0, 9),
+                }
+            )
 
             name_index += 1
 
@@ -335,12 +489,10 @@ def build_freight_history(routes, vessel_classes, rng, days=540):
     rows = []
 
     for route in routes:
-
         if representative[route["origin_country"]] != route["origin"]:
             continue
 
         for spec in vessel_classes:
-
             vessel_type = spec["vessel_type"]
 
             # Distance premium, normalised against a 4000 nm reference.
@@ -353,7 +505,6 @@ def build_freight_history(routes, vessel_classes, rng, days=540):
             rate = level
 
             for day_index in range(days):
-
                 current = start + timedelta(days=day_index)
 
                 # Annual seasonality: monsoon and restocking cycles.
@@ -372,9 +523,7 @@ def build_freight_history(routes, vessel_classes, rng, days=540):
                     max(
                         0.02,
                         0.18
-                        + 0.12 * math.sin(
-                            2 * math.pi * (current.timetuple().tm_yday / 365.0) + 1.1
-                        )
+                        + 0.12 * math.sin(2 * math.pi * (current.timetuple().tm_yday / 365.0) + 1.1)
                         + rng.gauss(0, 0.05),
                     ),
                 )
@@ -387,25 +536,25 @@ def build_freight_history(routes, vessel_classes, rng, days=540):
 
                 commodity_price = round(
                     108
-                    + 16 * math.sin(
-                        2 * math.pi * (current.timetuple().tm_yday / 365.0) + 0.4
-                    )
+                    + 16 * math.sin(2 * math.pi * (current.timetuple().tm_yday / 365.0) + 0.4)
                     + rng.gauss(0, 3),
                     2,
                 )
 
-                rows.append({
-                    "date": current.isoformat(),
-                    "origin": route["origin_country"],
-                    "origin_port": route["origin"],
-                    "destination": route["destination"],
-                    "vessel_type": vessel_type,
-                    "distance_nm": route["distance"],
-                    "freight_rate": round(rate, 2),
-                    "commodity_price": commodity_price,
-                    "congestion": round(congestion, 3),
-                    "vessel_supply": vessel_supply,
-                })
+                rows.append(
+                    {
+                        "date": current.isoformat(),
+                        "origin": route["origin_country"],
+                        "origin_port": route["origin"],
+                        "destination": route["destination"],
+                        "vessel_type": vessel_type,
+                        "distance_nm": route["distance"],
+                        "freight_rate": round(rate, 2),
+                        "commodity_price": commodity_price,
+                        "congestion": round(congestion, 3),
+                        "vessel_supply": vessel_supply,
+                    }
+                )
 
     return rows
 

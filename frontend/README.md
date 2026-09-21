@@ -52,8 +52,18 @@ To use Member 2's FastAPI service, set `VITE_USE_MOCK=false` and point `VITE_API
   },
   "confidence": 0.82,
   "risk": "MEDIUM",
-  "monte_carlo": { "expected_future_rate": 29200, "simulated_q10": 27100, "simulated_q50": 29050, "simulated_q90": 34800 },
+  "monte_carlo": {
+    "expected_future_rate": 29200,
+    "simulated_q10": 27100,
+    "simulated_q50": 29050,
+    "simulated_q90": 34800
+  },
   "forecast_series": [{ "day": 1, "expected": 32000, "lower": 31000, "upper": 33000 }],
-  "recommended_vessel": { "vessel": "MV Ocean Star", "type": "Panamax", "distance_nm": 320, "available": true }
+  "recommended_vessel": {
+    "vessel": "MV Ocean Star",
+    "type": "Panamax",
+    "distance_nm": 320,
+    "available": true
+  }
 }
 ```

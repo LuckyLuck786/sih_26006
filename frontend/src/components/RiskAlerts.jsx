@@ -1,4 +1,5 @@
-import { Panel, Pill, SEVERITY_STYLES } from './ui'
+import { SEVERITY_STYLES } from '../lib/format'
+import { Panel, Pill } from './ui'
 
 /**
  * PS 26006 requirement (d): early warnings for market volatility, port
@@ -34,7 +35,11 @@ export default function RiskAlerts({ risk }) {
       eyebrow="Requirement (d) · Risk mitigation"
       title={`${risk.alert_count || 0} active warning${risk.alert_count === 1 ? '' : 's'}`}
       subtitle="Volatility, congestion, supply and decision fragility"
-      right={<Pill tone={OVERALL_TONE[risk.overall_risk] || 'bg-slate-200 text-slate-800'}>{risk.overall_risk}</Pill>}
+      right={
+        <Pill tone={OVERALL_TONE[risk.overall_risk] || 'bg-slate-200 text-slate-800'}>
+          {risk.overall_risk}
+        </Pill>
+      }
     >
       <ul className="space-y-3">
         {alerts.map((alert, index) => (

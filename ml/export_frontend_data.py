@@ -21,10 +21,7 @@ import os
 from ml import pipeline
 from ml.forecasting import forecast_service
 
-
-OUT_DIR = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "..", "frontend", "src", "data"
-)
+OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend", "src", "data")
 
 
 def main():
@@ -50,14 +47,11 @@ def main():
     for origin in origins:
         for destination in destinations:
             for spec in classes:
-
                 vessel_type = spec["vessel_type"]
                 key = f"{origin}|{destination}|{vessel_type}"
 
                 try:
-                    result = forecast_service.forecast_lane(
-                        origin, destination, vessel_type
-                    )
+                    result = forecast_service.forecast_lane(origin, destination, vessel_type)
                 except ValueError:
                     continue
 
@@ -81,10 +75,13 @@ def main():
     write("routes.json", routes)
     write("vessels.json", data["vessels"])
 
-    write("model_metrics.json", {
-        "metrics": forecast_service.load_metrics(),
-        "feature_importance": forecast_service.load_feature_importance(),
-    })
+    write(
+        "model_metrics.json",
+        {
+            "metrics": forecast_service.load_metrics(),
+            "feature_importance": forecast_service.load_feature_importance(),
+        },
+    )
 
     print(f"forecasts.json        {generated:>5} lane/class forecasts")
     print(f"ports.json            {len(ports):>5} ports")

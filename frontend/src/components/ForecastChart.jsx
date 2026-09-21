@@ -10,7 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 
-import { rate } from './ui'
+import { rate } from '../lib/format'
 
 /**
  * Forecast curve with the Q10-Q90 band.
@@ -32,7 +32,9 @@ export default function ForecastChart({ series = [], currentRate, horizonDays = 
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.15em] text-teal-700">Rate outlook</p>
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-teal-700">
+            Rate outlook
+          </p>
           <h2 className="font-display mt-1 text-xl font-bold text-slate-900">Freight forecast</h2>
         </div>
         <p className="text-xs text-slate-400">{horizonDays}-day planning window · US$ per tonne</p>
@@ -51,7 +53,13 @@ export default function ForecastChart({ series = [], currentRate, horizonDays = 
                 dataKey="day"
                 tickLine={false}
                 axisLine={false}
-                label={{ value: 'Day', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 12 }}
+                label={{
+                  value: 'Day',
+                  position: 'insideBottom',
+                  offset: -4,
+                  fill: '#64748b',
+                  fontSize: 12,
+                }}
               />
               <YAxis
                 tickLine={false}
@@ -74,7 +82,13 @@ export default function ForecastChart({ series = [], currentRate, horizonDays = 
                 ]}
                 labelFormatter={(day) => `Day ${day}`}
               />
-              <Area type="monotone" dataKey="base" stackId="range" stroke="none" fill="transparent" />
+              <Area
+                type="monotone"
+                dataKey="base"
+                stackId="range"
+                stroke="none"
+                fill="transparent"
+              />
               <Area
                 type="monotone"
                 dataKey="band"

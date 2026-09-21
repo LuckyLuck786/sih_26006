@@ -19,7 +19,6 @@ procurement decision.
 
 import math
 
-
 # A loaded bulk carrier floats at its summer draft. In ballast it sits at
 # roughly 35% of that. Payload scales approximately linearly between the
 # two, which is accurate enough for parcel sizing.
@@ -53,10 +52,7 @@ def draft_limited_payload(dwt, summer_draft, available_draft):
     if usable_draft <= lightship_draft:
         return 0.0
 
-    utilisation = (
-        (usable_draft - lightship_draft)
-        / (summer_draft - lightship_draft)
-    )
+    utilisation = (usable_draft - lightship_draft) / (summer_draft - lightship_draft)
 
     return float(dwt) * utilisation
 
@@ -88,26 +84,19 @@ def assess_class(
     # ----------------------------------------------------------
 
     for port in (load_port, discharge_port):
-
         if spec["LOA"] > port["max_LOA"]:
-            blockers.append(
-                f"LOA {spec['LOA']}m exceeds {port['port']} limit "
-                f"{port['max_LOA']}m"
-            )
+            blockers.append(f"LOA {spec['LOA']}m exceeds {port['port']} limit {port['max_LOA']}m")
 
         if spec["beam"] > port["max_beam"]:
             blockers.append(
-                f"Beam {spec['beam']}m exceeds {port['port']} limit "
-                f"{port['max_beam']}m"
+                f"Beam {spec['beam']}m exceeds {port['port']} limit {port['max_beam']}m"
             )
 
     # ----------------------------------------------------------
     # 2. Draft-limited payload at each end
     # ----------------------------------------------------------
 
-    load_payload = draft_limited_payload(
-        spec["dwt"], spec["draft"], load_port["max_draft"]
-    )
+    load_payload = draft_limited_payload(spec["dwt"], spec["draft"], load_port["max_draft"])
 
     discharge_payload = draft_limited_payload(
         spec["dwt"], spec["draft"], discharge_port["max_draft"]
@@ -116,9 +105,7 @@ def assess_class(
     payload = min(load_payload, discharge_payload)
 
     binding_port = (
-        discharge_port["port"]
-        if discharge_payload <= load_payload
-        else load_port["port"]
+        discharge_port["port"] if discharge_payload <= load_payload else load_port["port"]
     )
 
     if payload <= 0:
@@ -171,15 +158,10 @@ def assess_class(
     hire_cost = spec["daily_hire_usd"] * round_trip_days * voyages
 
     bunker_cost = (
-        spec["bunker_tonnes_per_day"]
-        * (sea_days * 2.0)
-        * voyages
-        * BUNKER_PRICE_USD_PER_TONNE
+        spec["bunker_tonnes_per_day"] * (sea_days * 2.0) * voyages * BUNKER_PRICE_USD_PER_TONNE
     )
 
-    port_charges = (
-        PORT_CHARGE_USD_PER_DWT * spec["dwt"] * voyages * 2
-    )
+    port_charges = PORT_CHARGE_USD_PER_DWT * spec["dwt"] * voyages * 2
 
     total_cost = freight_cost + hire_cost + bunker_cost + port_charges
 
@@ -197,14 +179,12 @@ def assess_class(
 
     if utilisation < 0.6:
         notes.append(
-            f"Only {utilisation * 100:.0f}% of deadweight used — "
-            f"parcel is small for this class"
+            f"Only {utilisation * 100:.0f}% of deadweight used — parcel is small for this class"
         )
 
     if payload < spec["dwt"] * 0.95:
         notes.append(
-            f"Draft-limited at {binding_port} to "
-            f"{payload:,.0f} t of {spec['dwt']:,} t capacity"
+            f"Draft-limited at {binding_port} to {payload:,.0f} t of {spec['dwt']:,} t capacity"
         )
 
     if voyages > 1:
@@ -252,7 +232,6 @@ def rank_vessel_classes(
     assessed = []
 
     for spec in vessel_classes:
-
         rate = rate_per_tonne_by_class.get(
             spec["vessel_type"],
             rate_per_tonne_by_class.get("default", 0.0),
@@ -284,8 +263,7 @@ def rank_vessel_classes(
 
     if len(feasible) >= 2:
         saving_vs_next = round(
-            (feasible[1]["cost_per_tonne_usd"] - feasible[0]["cost_per_tonne_usd"])
-            * cargo_quantity
+            (feasible[1]["cost_per_tonne_usd"] - feasible[0]["cost_per_tonne_usd"]) * cargo_quantity
         )
 
     return {
@@ -297,7 +275,6 @@ def rank_vessel_classes(
 
 
 if __name__ == "__main__":
-
     import json
     import os
 
@@ -317,7 +294,6 @@ if __name__ == "__main__":
     }
 
     for discharge in ["Gangavaram", "Paradip", "Haldia"]:
-
         result = rank_vessel_classes(
             vessel_classes=classes,
             load_port=ports["Newcastle"],

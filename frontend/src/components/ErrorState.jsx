@@ -1,1 +1,20 @@
-export default function ErrorState({ message, onRetry }) { return <div className="rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-[0.15em] text-red-700">Analysis unavailable</p><h2 className="mt-1 font-display text-xl font-bold text-red-900">We could not complete the forecast.</h2><p className="mt-2 text-sm text-red-800">{message}</p><button type="button" onClick={onRetry} className="mt-4 rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white hover:bg-red-800">Retry analysis</button></div> }
+export default function ErrorState({ message, onRetry }) {
+  return (
+    <div className="rounded-2xl border border-red-200 bg-red-50 p-6 shadow-sm">
+      <p className="text-xs font-bold uppercase tracking-[0.15em] text-red-700">
+        Analysis unavailable
+      </p>
+      <h2 className="mt-1 font-display text-xl font-bold text-red-900">
+        We could not complete the forecast.
+      </h2>
+      <p className="mt-2 text-sm text-red-800">{message}</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="mt-4 rounded-lg bg-red-700 px-4 py-2 text-sm font-bold text-white hover:bg-red-800"
+      >
+        Retry analysis
+      </button>
+    </div>
+  )
+}

@@ -1,4 +1,5 @@
-import { money, rate, percent, Panel, Pill } from './ui'
+import { money, rate, percent } from '../lib/format'
+import { Panel, Pill } from './ui'
 
 /**
  * The stated Objective of PS 26006:
@@ -83,19 +84,27 @@ export default function ContractStrategy({ contract }) {
 
       <div className="mt-5 grid gap-4 border-t border-slate-100 pt-4 sm:grid-cols-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Term cheaper in</p>
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+            Term cheaper in
+          </p>
           <p className="mt-1 text-lg font-black text-slate-900">
             {percent(contract.probability_term_cheaper)}
           </p>
           <p className="text-xs text-slate-400">of simulated markets</p>
         </div>
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Spot tail risk</p>
-          <p className="mt-1 text-lg font-black text-slate-900">{money(contract.spot_cvar80_cost_usd)}</p>
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+            Spot tail risk
+          </p>
+          <p className="mt-1 text-lg font-black text-slate-900">
+            {money(contract.spot_cvar80_cost_usd)}
+          </p>
           <p className="text-xs text-slate-400">mean of the worst 20%</p>
         </div>
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Certainty gain</p>
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+            Certainty gain
+          </p>
           <p
             className={`mt-1 text-lg font-black ${contract.cost_certainty_gain_usd >= 0 ? 'text-emerald-700' : 'text-slate-900'}`}
           >
@@ -105,7 +114,9 @@ export default function ContractStrategy({ contract }) {
         </div>
       </div>
 
-      <p className="mt-4 rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-600">{contract.rationale}</p>
+      <p className="mt-4 rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-600">
+        {contract.rationale}
+      </p>
     </Panel>
   )
 }

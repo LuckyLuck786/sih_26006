@@ -39,9 +39,7 @@ export default async function handler(request, response) {
   const apiKey = process.env.DATADOCKED_API_KEY
 
   if (!apiKey) {
-    return response
-      .status(200)
-      .json({ source: 'simulated', reason: 'no_api_key', vessels: [] })
+    return response.status(200).json({ source: 'simulated', reason: 'no_api_key', vessels: [] })
   }
 
   const cacheKey = `${lat.toFixed(2)},${lon.toFixed(2)},${circleRadius}`
@@ -79,9 +77,7 @@ export default async function handler(request, response) {
 
     // The endpoint has returned a bare array and an object wrapper at
     // different times, so normalise both into a list.
-    const vessels = Array.isArray(data)
-      ? data
-      : data?.data || data?.vessels || data?.results || []
+    const vessels = Array.isArray(data) ? data : data?.data || data?.vessels || data?.results || []
 
     const payload = { source: 'live', vessels }
 

@@ -23,7 +23,6 @@ parcel, so it is divided by the cargo quantity before it meets a rate.
 """
 
 import json
-import math
 import os
 
 from ml.decision.charter_decision import calculate_charter_decision
@@ -74,7 +73,8 @@ def resolve_route(origin, destination):
     data = reference_data()
 
     candidates = [
-        r for r in data["routes"]
+        r
+        for r in data["routes"]
         if r["destination"] == destination
         and (r["origin"] == origin or r["origin_country"] == origin)
     ]
@@ -89,7 +89,8 @@ def available_vessels_for(load_port_name, vessel_type=None):
     data = reference_data()
 
     return [
-        v for v in data["vessels"]
+        v
+        for v in data["vessels"]
         if v["location"] == load_port_name
         and v["status"] == "available"
         and (vessel_type is None or v["vessel_type"] == vessel_type)
@@ -157,17 +158,14 @@ def run_decision_pipeline(
             chosen = match
         else:
             rejected = next(
-                (o for o in vessel_result["rejected"]
-                 if o["vessel_type"] == vessel_type),
+                (o for o in vessel_result["rejected"] if o["vessel_type"] == vessel_type),
                 None,
             )
             if rejected:
                 user_choice_infeasible = rejected
 
     if chosen is None:
-        raise ValueError(
-            f"No vessel class can serve {route['origin']} -> {destination}"
-        )
+        raise ValueError(f"No vessel class can serve {route['origin']} -> {destination}")
 
     chosen_type = chosen["vessel_type"]
 
@@ -194,8 +192,7 @@ def run_decision_pipeline(
     )
 
     waiting_cost_per_tonne_day = (
-        waiting_detail["waiting_cost_per_day"] / cargo_quantity
-        if cargo_quantity else 0.0
+        waiting_detail["waiting_cost_per_day"] / cargo_quantity if cargo_quantity else 0.0
     )
 
     # Cost of waiting out the whole forecast horizon.
@@ -302,7 +299,6 @@ def run_decision_pipeline(
             "requested_vessel_type": vessel_type,
             "horizon_days": horizon_days,
         },
-
         "route": {
             "load_port": load_port["port"],
             "load_port_unlocode": load_port["unlocode"],
@@ -315,7 +311,6 @@ def run_decision_pipeline(
             "distance_nm": route["distance"],
             "distance_source": route.get("distance_source"),
         },
-
         "forecast": {
             "best": forecast["best"],
             "expected": forecast["expected"],
@@ -325,35 +320,25 @@ def run_decision_pipeline(
             "source": forecast["source"],
             "unit": "USD per tonne",
         },
-
         "forecast_series": forecast["series"],
-
         "decision": {
             **decision,
             "waiting_cost_per_tonne_day": round(waiting_cost_per_tonne_day, 4),
             "waiting_cost_detail": waiting_detail,
         },
-
         "confidence": decision["confidence"],
         "risk_level": decision["risk"],
-
         "optimal_timing": timing,
-
         "monte_carlo": simulation,
-
         "vessel_recommendation": {
             **vessel_result,
             "chosen": chosen,
             "user_choice_infeasible": user_choice_infeasible,
             "open_vessels": open_vessels,
         },
-
         "idle": idle,
-
         "contract_strategy": contract,
-
         "risk": risk,
-
         "model": {
             "metrics": forecast_service.load_metrics(),
             "feature_importance": forecast_service.load_feature_importance(),
@@ -362,7 +347,6 @@ def run_decision_pipeline(
 
 
 if __name__ == "__main__":
-
     result = run_decision_pipeline(
         origin="Australia",
         destination="Paradip",
@@ -375,26 +359,38 @@ if __name__ == "__main__":
     print("=" * 62)
 
     r = result["route"]
-    print(f"\nLane      : {r['load_port']} ({r['load_port_unlocode']}) -> "
-          f"{r['discharge_port']} ({r['discharge_port_unlocode']})")
+    print(
+        f"\nLane      : {r['load_port']} ({r['load_port_unlocode']}) -> "
+        f"{r['discharge_port']} ({r['discharge_port_unlocode']})"
+    )
     print(f"Distance  : {r['distance_nm']:,} nm")
 
     f = result["forecast"]
     print(f"\nRate now  : ${f['current_rate']}/t")
     print(f"Forecast  : ${f['best']} / ${f['expected']} / ${f['worst']} per t")
 
-    print(f"\n(a) Timing   : {result['optimal_timing']['decision']} — "
-          f"{result['optimal_timing']['recommended_window']}")
+    print(
+        f"\n(a) Timing   : {result['optimal_timing']['decision']} — "
+        f"{result['optimal_timing']['recommended_window']}"
+    )
 
     v = result["vessel_recommendation"]["chosen"]
-    print(f"(b) Vessel   : {v['vessel_type']} @ ${v['cost_per_tonne_usd']}/t, "
-          f"{v['voyages_required']} voyage(s)")
+    print(
+        f"(b) Vessel   : {v['vessel_type']} @ ${v['cost_per_tonne_usd']}/t, "
+        f"{v['voyages_required']} voyage(s)"
+    )
 
-    print(f"(c) Idle     : {result['idle']['idle_days']} days "
-          f"({result['idle']['idle_share'] * 100:.0f}% of round trip)")
+    print(
+        f"(c) Idle     : {result['idle']['idle_days']} days "
+        f"({result['idle']['idle_share'] * 100:.0f}% of round trip)"
+    )
 
-    print(f"(d) Risk     : {result['risk']['overall_risk']} — "
-          f"{result['risk']['alert_count']} alert(s)")
+    print(
+        f"(d) Risk     : {result['risk']['overall_risk']} — "
+        f"{result['risk']['alert_count']} alert(s)"
+    )
 
-    print(f"Objective    : {result['contract_strategy']['recommendation']} "
-          f"for {result['request']['contract_duration_days']} days")
+    print(
+        f"Objective    : {result['contract_strategy']['recommendation']} "
+        f"for {result['request']['contract_duration_days']} days"
+    )

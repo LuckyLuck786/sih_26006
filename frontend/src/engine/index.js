@@ -46,7 +46,9 @@ const DEMURRAGE_USD_PER_DAY = {
 
 export const PORTS_BY_NAME = Object.fromEntries(ports.map((p) => [p.port, p]))
 
-export const ORIGINS = [...new Set(ports.filter((p) => p.role === 'load').map((p) => p.country))].sort()
+export const ORIGINS = [
+  ...new Set(ports.filter((p) => p.role === 'load').map((p) => p.country)),
+].sort()
 
 export const DESTINATIONS = ports.filter((p) => p.role === 'discharge').map((p) => p.port)
 
@@ -83,9 +85,9 @@ function gaussianSampler(seed) {
       spare = null
       return mean + sigma * value
     }
-    let u = 0
-    let v = 0
-    let s = 0
+    let u
+    let v
+    let s
     do {
       u = rand() * 2 - 1
       v = rand() * 2 - 1
@@ -214,7 +216,9 @@ function assessClass(spec, loadPort, dischargePort, cargoQuantity, distanceNm, r
 
   const notes = []
   if (utilisation < 0.6) {
-    notes.push(`Only ${Math.round(utilisation * 100)}% of deadweight used — parcel is small for this class`)
+    notes.push(
+      `Only ${Math.round(utilisation * 100)}% of deadweight used — parcel is small for this class`,
+    )
   }
   if (payload < spec.dwt * 0.95) {
     notes.push(
@@ -246,7 +250,13 @@ function assessClass(spec, loadPort, dischargePort, cargoQuantity, distanceNm, r
   }
 }
 
-export function rankVesselClasses(loadPort, dischargePort, cargoQuantity, distanceNm, ratesByClass) {
+export function rankVesselClasses(
+  loadPort,
+  dischargePort,
+  cargoQuantity,
+  distanceNm,
+  ratesByClass,
+) {
   const assessed = vesselClasses.map((spec) =>
     assessClass(
       spec,
@@ -258,7 +268,9 @@ export function rankVesselClasses(loadPort, dischargePort, cargoQuantity, distan
     ),
   )
 
-  const feasible = assessed.filter((a) => a.feasible).sort((a, b) => a.cost_per_tonne_usd - b.cost_per_tonne_usd)
+  const feasible = assessed
+    .filter((a) => a.feasible)
+    .sort((a, b) => a.cost_per_tonne_usd - b.cost_per_tonne_usd)
   feasible.forEach((option, index) => {
     option.rank = index + 1
   })
@@ -267,17 +279,30 @@ export function rankVesselClasses(loadPort, dischargePort, cargoQuantity, distan
 
   const savingVsNext =
     feasible.length >= 2
-      ? Math.round((feasible[1].cost_per_tonne_usd - feasible[0].cost_per_tonne_usd) * cargoQuantity)
+      ? Math.round(
+          (feasible[1].cost_per_tonne_usd - feasible[0].cost_per_tonne_usd) * cargoQuantity,
+        )
       : null
 
-  return { recommended: feasible[0] || null, ranked: feasible, rejected, saving_vs_next_best_usd: savingVsNext }
+  return {
+    recommended: feasible[0] || null,
+    ranked: feasible,
+    rejected,
+    saving_vs_next_best_usd: savingVsNext,
+  }
 }
 
 // ---------------------------------------------------------------
 // Waiting cost and the charter/wait comparison
 // ---------------------------------------------------------------
 
-export function waitingCost({ cargoQuantity, cargoValuePerTon, annualCarryingRate, storagePerDay = 0, opsPerDay = 0 }) {
+export function waitingCost({
+  cargoQuantity,
+  cargoValuePerTon,
+  annualCarryingRate,
+  storagePerDay = 0,
+  opsPerDay = 0,
+}) {
   const cargoValue = cargoQuantity * cargoValuePerTon
   const dailyCarrying = (cargoValue * annualCarryingRate) / 365
   const total = dailyCarrying + storagePerDay + opsPerDay
@@ -346,8 +371,14 @@ export function monteCarlo(currentRate, best, expected, worst, waitCost, simulat
     simulated_q90: round(percentile(sorted, 0.9), 2),
     expected_saving: round(mean(savings), 2),
     probability_of_saving: round(savings.filter((s) => s > 0).length / simulations, 4),
-    probability_rate_increase: round(futureRates.filter((r) => r > currentRate).length / simulations, 4),
-    probability_rate_decrease: round(futureRates.filter((r) => r < currentRate).length / simulations, 4),
+    probability_rate_increase: round(
+      futureRates.filter((r) => r > currentRate).length / simulations,
+      4,
+    ),
+    probability_rate_decrease: round(
+      futureRates.filter((r) => r < currentRate).length / simulations,
+      4,
+    ),
   }
 }
 
@@ -408,7 +439,15 @@ function leastSquares3(x, y) {
   return out
 }
 
-export function optimalStopping(currentRate, expected, best, worst, waitCostPerDay, horizonDays = 14, simulations = 3000) {
+export function optimalStopping(
+  currentRate,
+  expected,
+  best,
+  worst,
+  waitCostPerDay,
+  horizonDays = 14,
+  simulations = 3000,
+) {
   const normal = gaussianSampler(SEED + 7)
 
   const horizonSigma = Math.max((worst - best) / 2.56, 1e-6)
@@ -493,7 +532,15 @@ export function estimateBerthWaitDays(congestion, berths) {
   return round((CONGESTION_QUEUE_DAYS * c * c * 2) / Math.max(berths, 1), 2)
 }
 
-export function analyseIdle(vesselType, tonnesPerVoyage, loadPort, dischargePort, seaDays, loadCongestion, dischargeCongestion) {
+export function analyseIdle(
+  vesselType,
+  tonnesPerVoyage,
+  loadPort,
+  dischargePort,
+  seaDays,
+  loadCongestion,
+  dischargeCongestion,
+) {
   const loadDays = tonnesPerVoyage / loadPort.cargo_handling_rate
   const dischargeDays = tonnesPerVoyage / dischargePort.cargo_handling_rate
 
@@ -590,7 +637,9 @@ export function compareSpotVsTerm({
 
   const fixtureDays = []
   for (let i = 0; i < Math.max(voyagesRequired, 1); i += 1) {
-    fixtureDays.push(Math.min(Math.round((i * contractDays) / Math.max(voyagesRequired, 1)), rates.length - 1))
+    fixtureDays.push(
+      Math.min(Math.round((i * contractDays) / Math.max(voyagesRequired, 1)), rates.length - 1),
+    )
   }
 
   const expectedAtFixture = fixtureDays.map((d) => rates[d])
@@ -616,7 +665,9 @@ export function compareSpotVsTerm({
     for (let i = 0; i < fixtureDays.length; i += 1) {
       const horizonScale = Math.sqrt((fixtureDays[i] + 1) / Math.max(rates.length, 1))
       const sampled = Math.max(
-        expectedAtFixture[i] + marketShock * systematicSigma * horizonScale + normal(0, idiosyncraticSigma * horizonScale),
+        expectedAtFixture[i] +
+          marketShock * systematicSigma * horizonScale +
+          normal(0, idiosyncraticSigma * horizonScale),
         0,
       )
       total += sampled * tonnesPerVoyage
@@ -690,21 +741,33 @@ export function buildRiskReport(opts) {
   if (expected > 0) {
     const bandPct = ((worst - best) / expected) * 100
     if (bandPct >= 30) {
-      add('volatility', 'high', 'Wide forecast band',
+      add(
+        'volatility',
+        'high',
+        'Wide forecast band',
         `The Q10-Q90 band spans ${bandPct.toFixed(0)}% of the expected rate ($${best}-$${worst}/t). Rate risk is elevated; favour shorter commitments or fix term.`,
-        round(bandPct, 1))
+        round(bandPct, 1),
+      )
     } else if (bandPct >= 18) {
-      add('volatility', 'medium', 'Moderate rate uncertainty',
+      add(
+        'volatility',
+        'medium',
+        'Moderate rate uncertainty',
         `Forecast band is ${bandPct.toFixed(0)}% of the expected rate. Build tolerance into the laycan rather than fixing on a point estimate.`,
-        round(bandPct, 1))
+        round(bandPct, 1),
+      )
     }
 
     if (recentVolatility != null) {
       const realisedPct = (recentVolatility / expected) * 100
       if (realisedPct >= 6) {
-        add('volatility', 'high', 'Realised volatility accelerating',
+        add(
+          'volatility',
+          'high',
+          'Realised volatility accelerating',
           `Rates have moved ${realisedPct.toFixed(1)}% (1 sigma) over the trailing window. Entry windows will be short-lived; monitor daily.`,
-          round(realisedPct, 1))
+          round(realisedPct, 1),
+        )
       }
     }
   }
@@ -716,57 +779,109 @@ export function buildRiskReport(opts) {
     if (congestion == null) continue
     const berths = port.berths ?? 2
     if (congestion >= 0.75) {
-      add('congestion', 'critical', `Severe congestion at ${port.port}`,
+      add(
+        'congestion',
+        'critical',
+        `Severe congestion at ${port.port}`,
         `${port.port} is running at ${Math.round(congestion * 100)}% berth utilisation across ${berths} berths. Expect multi-day waiting and demurrage on the ${role} leg.`,
-        round(congestion, 2))
+        round(congestion, 2),
+      )
     } else if (congestion >= 0.55) {
-      add('congestion', 'high', `Building congestion at ${port.port}`,
+      add(
+        'congestion',
+        'high',
+        `Building congestion at ${port.port}`,
         `${port.port} is at ${Math.round(congestion * 100)}% berth utilisation. Queues are forming; push the laycan later or widen laytime.`,
-        round(congestion, 2))
+        round(congestion, 2),
+      )
     } else if (congestion >= 0.4) {
-      add('congestion', 'medium', `Watch congestion at ${port.port}`,
+      add(
+        'congestion',
+        'medium',
+        `Watch congestion at ${port.port}`,
         `${port.port} is at ${Math.round(congestion * 100)}% utilisation — manageable now, but worth monitoring before fixing.`,
-        round(congestion, 2))
+        round(congestion, 2),
+      )
     }
   }
 
   if (vesselSupply != null) {
     if (vesselSupply <= 10) {
-      add('supply', 'high', 'Tight tonnage supply',
-        `Only ${vesselSupply} vessels are open on this lane. Owners hold pricing power; waiting is more likely to cost than save.`, vesselSupply)
+      add(
+        'supply',
+        'high',
+        'Tight tonnage supply',
+        `Only ${vesselSupply} vessels are open on this lane. Owners hold pricing power; waiting is more likely to cost than save.`,
+        vesselSupply,
+      )
     } else if (vesselSupply >= 32) {
-      add('supply', 'info', 'Ample tonnage available',
-        `${vesselSupply} vessels are open on this lane. Competition favours the charterer — there is room to negotiate.`, vesselSupply)
+      add(
+        'supply',
+        'info',
+        'Ample tonnage available',
+        `${vesselSupply} vessels are open on this lane. Competition favours the charterer — there is room to negotiate.`,
+        vesselSupply,
+      )
     }
   }
 
   if (availableVessels === 0) {
-    add('supply', 'critical', 'No open vessels matched',
-      'No available vessel in the tracked fleet matches this lane and class. Widen the vessel class or check an alternative load port.', 0)
+    add(
+      'supply',
+      'critical',
+      'No open vessels matched',
+      'No available vessel in the tracked fleet matches this lane and class. Widen the vessel class or check an alternative load port.',
+      0,
+    )
   }
 
   if (waitCost && Math.abs(netExpectedSaving) < waitCost * 1.5) {
-    add('decision', 'medium', 'Marginal charter/wait call',
+    add(
+      'decision',
+      'medium',
+      'Marginal charter/wait call',
       `Net expected saving ($${netExpectedSaving}/t) is within 1.5x the waiting cost. The recommendation could flip on a small rate move.`,
-      netExpectedSaving)
+      netExpectedSaving,
+    )
   }
 
-  if (probabilityWaitingWins != null && probabilityWaitingWins >= 0.42 && probabilityWaitingWins <= 0.58) {
-    add('decision', 'medium', 'Low conviction on timing',
+  if (
+    probabilityWaitingWins != null &&
+    probabilityWaitingWins >= 0.42 &&
+    probabilityWaitingWins <= 0.58
+  ) {
+    add(
+      'decision',
+      'medium',
+      'Low conviction on timing',
       `Waiting beats fixing in only ${Math.round(probabilityWaitingWins * 100)}% of simulated markets — close to a coin flip. Prefer the option that preserves flexibility.`,
-      round(probabilityWaitingWins, 3))
+      round(probabilityWaitingWins, 3),
+    )
   }
 
   alerts.sort((a, b) => (SEVERITY_ORDER[a.severity] ?? 9) - (SEVERITY_ORDER[b.severity] ?? 9))
 
   if (!alerts.length) {
-    add('clear', 'info', 'No active warnings',
-      'Volatility, congestion and tonnage supply are all within normal ranges for this lane.')
+    add(
+      'clear',
+      'info',
+      'No active warnings',
+      'Volatility, congestion and tonnage supply are all within normal ranges for this lane.',
+    )
   }
 
-  const counts = alerts.reduce((acc, a) => ({ ...acc, [a.severity]: (acc[a.severity] || 0) + 1 }), {})
+  const counts = alerts.reduce(
+    (acc, a) => ({ ...acc, [a.severity]: (acc[a.severity] || 0) + 1 }),
+    {},
+  )
 
-  const overall = counts.critical ? 'CRITICAL' : counts.high ? 'HIGH' : counts.medium ? 'MEDIUM' : 'LOW'
+  const overall = counts.critical
+    ? 'CRITICAL'
+    : counts.high
+      ? 'HIGH'
+      : counts.medium
+        ? 'MEDIUM'
+        : 'LOW'
 
   return {
     overall_risk: overall,
@@ -807,7 +922,13 @@ export function analyzeShipmentLocal(payload) {
   const rateValues = Object.values(ratesByClass)
   ratesByClass.default = rateValues.length ? mean(rateValues) : 0
 
-  const vesselResult = rankVesselClasses(loadPort, dischargePort, cargoQuantity, route.distance, ratesByClass)
+  const vesselResult = rankVesselClasses(
+    loadPort,
+    dischargePort,
+    cargoQuantity,
+    route.distance,
+    ratesByClass,
+  )
 
   let chosen = vesselResult.recommended
   let userChoiceInfeasible = null
@@ -815,36 +936,68 @@ export function analyzeShipmentLocal(payload) {
   if (vesselClass) {
     const match = vesselResult.ranked.find((o) => o.vessel_type === vesselClass)
     if (match) chosen = match
-    else userChoiceInfeasible = vesselResult.rejected.find((o) => o.vessel_type === vesselClass) || null
+    else
+      userChoiceInfeasible =
+        vesselResult.rejected.find((o) => o.vessel_type === vesselClass) || null
   }
 
   if (!chosen) {
-    throw new Error(`No vessel class can physically serve ${loadPort.port} to ${dischargePort.port}.`)
+    throw new Error(
+      `No vessel class can physically serve ${loadPort.port} to ${dischargePort.port}.`,
+    )
   }
 
   const forecast = lookupForecast(originCountry, destination, chosen.vessel_type)
   if (!forecast) throw new Error('No forecast available for this lane.')
 
   const horizonDays = forecast.horizon_days || 14
-  const series = buildSeries(forecast.current_rate, forecast.expected, forecast.best, forecast.worst, horizonDays)
+  const series = buildSeries(
+    forecast.current_rate,
+    forecast.expected,
+    forecast.best,
+    forecast.worst,
+    horizonDays,
+  )
 
   const wait = waitingCost({ cargoQuantity, cargoValuePerTon, annualCarryingRate })
   const waitPerTonneDay = wait.waiting_cost_per_tonne_day
   const waitOverHorizon = waitPerTonneDay * horizonDays
 
-  const decision = charterDecision(forecast.current_rate, forecast.best, forecast.expected, forecast.worst, waitOverHorizon)
+  const decision = charterDecision(
+    forecast.current_rate,
+    forecast.best,
+    forecast.expected,
+    forecast.worst,
+    waitOverHorizon,
+  )
 
-  const simulation = monteCarlo(forecast.current_rate, forecast.best, forecast.expected, forecast.worst, waitOverHorizon)
+  const simulation = monteCarlo(
+    forecast.current_rate,
+    forecast.best,
+    forecast.expected,
+    forecast.worst,
+    waitOverHorizon,
+  )
 
   const timing = optimalStopping(
-    forecast.current_rate, forecast.expected, forecast.best, forecast.worst, waitPerTonneDay, horizonDays,
+    forecast.current_rate,
+    forecast.expected,
+    forecast.best,
+    forecast.worst,
+    waitPerTonneDay,
+    horizonDays,
   )
 
   const loadCongestion = Math.min(forecast.congestion * 1.1, 0.95)
 
   const idle = analyseIdle(
-    chosen.vessel_type, chosen.tonnes_per_voyage, loadPort, dischargePort,
-    chosen.sea_days, loadCongestion, forecast.congestion,
+    chosen.vessel_type,
+    chosen.tonnes_per_voyage,
+    loadPort,
+    dischargePort,
+    chosen.sea_days,
+    loadCongestion,
+    forecast.congestion,
   )
 
   const contract = compareSpotVsTerm({
@@ -856,7 +1009,10 @@ export function analyzeShipmentLocal(payload) {
   })
 
   const openVessels = fleet.filter(
-    (v) => v.location === loadPort.port && v.status === 'available' && v.vessel_type === chosen.vessel_type,
+    (v) =>
+      v.location === loadPort.port &&
+      v.status === 'available' &&
+      v.vessel_type === chosen.vessel_type,
   )
 
   const risk = buildRiskReport({
@@ -876,7 +1032,13 @@ export function analyzeShipmentLocal(payload) {
   })
 
   return {
-    request: { origin, origin_country: originCountry, destination, cargo_quantity: cargoQuantity, contract_duration_days: contractDuration },
+    request: {
+      origin,
+      origin_country: originCountry,
+      destination,
+      cargo_quantity: cargoQuantity,
+      contract_duration_days: contractDuration,
+    },
     route: {
       load_port: loadPort.port,
       load_port_unlocode: loadPort.unlocode,
@@ -898,12 +1060,21 @@ export function analyzeShipmentLocal(payload) {
       unit: 'USD per tonne',
     },
     forecast_series: series,
-    decision: { ...decision, waiting_cost_per_tonne_day: waitPerTonneDay, waiting_cost_detail: wait },
+    decision: {
+      ...decision,
+      waiting_cost_per_tonne_day: waitPerTonneDay,
+      waiting_cost_detail: wait,
+    },
     confidence: decision.confidence,
     risk_level: decision.risk,
     optimal_timing: timing,
     monte_carlo: simulation,
-    vessel_recommendation: { ...vesselResult, chosen, user_choice_infeasible: userChoiceInfeasible, open_vessels: openVessels },
+    vessel_recommendation: {
+      ...vesselResult,
+      chosen,
+      user_choice_infeasible: userChoiceInfeasible,
+      open_vessels: openVessels,
+    },
     idle,
     contract_strategy: contract,
     risk,

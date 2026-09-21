@@ -1,4 +1,5 @@
-import { rate, percent, Panel, Stat, Pill } from './ui'
+import { rate, percent } from '../lib/format'
+import { Panel, Stat, Pill } from './ui'
 
 /**
  * PS 26006 requirement (a): optimal market entry timing.
