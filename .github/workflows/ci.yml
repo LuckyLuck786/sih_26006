@@ -39,7 +39,7 @@ jobs:
         run: pytest --cov=ml --cov=src --cov-report=term-missing
 
   frontend:
-    name: Frontend (lint + build)
+    name: Frontend (lint + tests + build)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -62,6 +62,9 @@ jobs:
 
       - name: Check formatting
         run: npm run format:check
+
+      - name: Run tests
+        run: npm test
 
       - name: Build
         run: npm run build

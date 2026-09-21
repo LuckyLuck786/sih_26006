@@ -141,6 +141,7 @@ ruff check . && ruff format --check .
 cd frontend
 npm run lint
 npm run format:check
+npm test                  # 61 engine tests
 npm run build
 ```
 
@@ -193,7 +194,9 @@ src/              Vessel availability, port compatibility, routing
 tests/            pytest suite
 frontend/
   api/            Serverless AIS proxy (keeps the key server-side)
-  src/engine/     Browser mirror of the Python decision math
+  src/engine/     Browser mirror of the Python decision math, one
+                  module per Python module (vessels, timing, idle,
+                  contracts, risk)
   src/components/ One panel per PS requirement
   src/lib/        Formatting helpers and form defaults
 ```
