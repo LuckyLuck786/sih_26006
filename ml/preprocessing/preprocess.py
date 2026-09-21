@@ -1,273 +1,189 @@
-import pandas as pd
+"""
+Feature pipeline for the freight-rate forecasting model.
+
+One correctness note that matters a great deal here. The first version
+computed lags and rolling statistics across the whole dataframe. That was
+safe only because the dataset held a single lane. The dataset now carries
+140 distinct origin/destination/class series interleaved, so a global
+shift(1) would read the previous row from a *different lane* — the last
+Capesize value leaking into the first Handysize row.
+
+Every temporal feature is therefore computed inside a groupby on the
+series key, and the target is shifted inside the same groups.
+"""
+
 import numpy as np
+import pandas as pd
 
-
-# ============================================================
-# CONFIGURATION
-# ============================================================
 
 DATA_PATH = "data/synthetic/freight_rate.csv"
 
+# How far ahead the model forecasts.
+#
+# Next-day forecasting is close to unbeatable by persistence on a
+# mean-reverting series, and it is not the question PS 26006 asks. The
+# problem statement is about identifying an entry *window* for a short or
+# mid-term charter, so the model targets the rate two weeks out, where
+# seasonality, congestion and supply carry real signal.
+FORECAST_HORIZON_DAYS = 14
 
-# ============================================================
-# LOAD DATA
-# ============================================================
+# The columns that jointly identify one time series.
+SERIES_KEYS = ["origin", "destination", "vessel_type"]
+
+NUMERIC_COLUMNS = [
+    "freight_rate",
+    "commodity_price",
+    "congestion",
+    "vessel_supply",
+    "distance_nm",
+]
+
+CATEGORICAL_COLUMNS = ["origin", "destination", "vessel_type"]
+
 
 def load_data(path=DATA_PATH):
-    """
-    Load the freight-rate CSV file.
-
-    Returns:
-        pandas.DataFrame
-    """
+    """Load the freight-rate history."""
 
     df = pd.read_csv(path)
-
-    print(f"Loaded {len(df)} rows from {path}")
-
+    print(f"Loaded {len(df):,} rows from {path}")
     return df
 
 
-# ============================================================
-# BASIC CLEANING
-# ============================================================
-
 def clean_data(df):
-    """
-    Perform basic data cleaning.
-
-    Steps:
-    1. Convert date to datetime
-    2. Sort by date
-    3. Remove duplicate rows
-    4. Handle missing values
-    """
+    """Types, ordering, duplicates and missing values."""
 
     df = df.copy()
 
-    # Convert date column
     df["date"] = pd.to_datetime(df["date"])
 
-    # Sort chronologically
-    df = df.sort_values("date").reset_index(drop=True)
+    df = df.sort_values(SERIES_KEYS + ["date"]).reset_index(drop=True)
 
-    # Remove duplicate rows
-    df = df.drop_duplicates().reset_index(drop=True)
+    df = df.drop_duplicates(subset=SERIES_KEYS + ["date"]).reset_index(drop=True)
 
-    # Handle missing numeric values
-    numeric_columns = [
-        "freight_rate",
-        "commodity_price",
-        "congestion",
-        "vessel_supply"
-    ]
+    for column in NUMERIC_COLUMNS:
+        if column in df.columns:
+            df[column] = (
+                df.groupby(SERIES_KEYS, observed=True)[column]
+                .transform(lambda s: s.interpolate().bfill().ffill())
+            )
 
-    for column in numeric_columns:
-        df[column] = df[column].interpolate()
-        df[column] = df[column].bfill()
-        df[column] = df[column].ffill()
-
-    # Handle missing categorical values
-    categorical_columns = [
-        "origin",
-        "destination",
-        "vessel_type"
-    ]
-
-    for column in categorical_columns:
+    for column in CATEGORICAL_COLUMNS:
         df[column] = df[column].fillna("Unknown")
 
     return df
 
 
-# ============================================================
-# FEATURE ENGINEERING
-# ============================================================
-
 def create_features(df):
     """
-    Create features that will later be used by the
-    freight-rate forecasting model.
+    Temporal features, computed within each series.
+
+    Every lag and rolling window is grouped so no value crosses a lane
+    boundary.
     """
 
     df = df.copy()
-
-    # --------------------------------------------------------
-    # Date features
-    # --------------------------------------------------------
 
     df["day"] = df["date"].dt.day
     df["month"] = df["date"].dt.month
     df["day_of_week"] = df["date"].dt.dayofweek
+    df["day_of_year"] = df["date"].dt.dayofyear
 
-    # --------------------------------------------------------
-    # Freight-rate lag features
-    # --------------------------------------------------------
+    # Seasonality as smooth cyclical features rather than a raw integer,
+    # so December and January sit next to each other.
+    df["season_sin"] = np.sin(2 * np.pi * df["day_of_year"] / 365.0)
+    df["season_cos"] = np.cos(2 * np.pi * df["day_of_year"] / 365.0)
 
-    # Previous day's freight rate
-    df["freight_rate_lag_1"] = df["freight_rate"].shift(1)
+    grouped = df.groupby(SERIES_KEYS, observed=True)["freight_rate"]
 
-    # Freight rate 3 days ago
-    df["freight_rate_lag_3"] = df["freight_rate"].shift(3)
+    for lag in (1, 3, 7, 14):
+        df[f"freight_rate_lag_{lag}"] = grouped.shift(lag)
 
-    # Freight rate 7 days ago
-    df["freight_rate_lag_7"] = df["freight_rate"].shift(7)
+    # Rolling windows are shifted by one first so the feature for day t
+    # never contains day t's own rate, then applied through transform so
+    # the window stays inside the series.
+    for window in (7, 14, 30):
+        df[f"freight_rate_rolling_mean_{window}"] = grouped.transform(
+            lambda s, w=window: s.shift(1).rolling(w).mean()
+        )
 
-    # --------------------------------------------------------
-    # Rolling statistics
-    # --------------------------------------------------------
+    for window in (7, 30):
+        df[f"freight_rate_rolling_std_{window}"] = grouped.transform(
+            lambda s, w=window: s.shift(1).rolling(w).std()
+        )
 
-    # 7-day average
-    df["freight_rate_rolling_mean_7"] = (
-        df["freight_rate"]
-        .rolling(window=7)
-        .mean()
+    df["freight_rate_change"] = grouped.pct_change()
+
+    # Momentum: where the rate sits against its own recent mean.
+    df["rate_vs_mean_7"] = (
+        df["freight_rate"] / df["freight_rate_rolling_mean_7"] - 1.0
     )
 
-    # 7-day standard deviation
-    df["freight_rate_rolling_std_7"] = (
-        df["freight_rate"]
-        .rolling(window=7)
-        .std()
+    # Supply and congestion carry signal of their own.
+    congestion_grouped = df.groupby(SERIES_KEYS, observed=True)["congestion"]
+    df["congestion_lag_1"] = congestion_grouped.shift(1)
+    df["congestion_rolling_mean_7"] = congestion_grouped.transform(
+        lambda s: s.shift(1).rolling(7).mean()
     )
 
-    # --------------------------------------------------------
-    # Freight rate change
-    # --------------------------------------------------------
-
-    df["freight_rate_change"] = (
-        df["freight_rate"]
-        .pct_change()
-    )
-
-    # --------------------------------------------------------
-    # Remove rows created by lag/rolling operations
-    # --------------------------------------------------------
+    supply_grouped = df.groupby(SERIES_KEYS, observed=True)["vessel_supply"]
+    df["vessel_supply_lag_1"] = supply_grouped.shift(1)
 
     df = df.dropna().reset_index(drop=True)
 
     return df
 
-
-# ============================================================
-# ENCODE CATEGORICAL FEATURES
-# ============================================================
 
 def encode_features(df):
-    """
-    Convert categorical variables into numerical values.
-
-    For this first prototype we use one-hot encoding.
-    """
+    """One-hot encode the categorical columns."""
 
     df = df.copy()
 
-    categorical_columns = [
-        "origin",
-        "destination",
-        "vessel_type"
-    ]
+    return pd.get_dummies(df, columns=CATEGORICAL_COLUMNS, dtype=int)
 
-    df = pd.get_dummies(
-        df,
-        columns=categorical_columns,
-        dtype=int
-    )
-
-    return df
-
-
-# ============================================================
-# CREATE X AND Y
-# ============================================================
-
-def prepare_model_data(df):
-    """
-    Separate model features (X) and target (y).
-
-    Target:
-        Next day's freight rate.
-    """
-
-    df = df.copy()
-
-    # Predict NEXT day's freight rate
-    df["target"] = df["freight_rate"].shift(-1)
-
-    # Remove final row because it has no future target
-    df = df.dropna().reset_index(drop=True)
-
-    # Columns that should NOT be used directly as features
-    columns_to_remove = [
-        "date",
-        "target"
-    ]
-
-    X = df.drop(columns=columns_to_remove)
-
-    y = df["target"]
-
-    return X, y
-
-
-# ============================================================
-# COMPLETE PREPROCESSING PIPELINE
-# ============================================================
 
 def preprocess_data(path=DATA_PATH):
-    """
-    Complete preprocessing pipeline.
-
-    Returns:
-        X -> model features
-        y -> target values
-        processed_df -> processed dataset
-    """
+    """Run the full pipeline."""
 
     print("\n1. Loading data...")
     df = load_data(path)
 
-    print("\n2. Cleaning data...")
+    print("2. Cleaning data...")
     df = clean_data(df)
 
-    print("\n3. Creating features...")
+    print("3. Creating features...")
     df = create_features(df)
 
-    print("\n4. Encoding categorical features...")
-    df = encode_features(df)
+    # The target is built before encoding so the groupby uses the real
+    # key columns rather than reconstructed dummy columns.
+    df["target"] = (
+        df.groupby(SERIES_KEYS, observed=True)["freight_rate"]
+        .shift(-FORECAST_HORIZON_DAYS)
+    )
+    df = df.dropna(subset=["target"]).reset_index(drop=True)
 
-    print("\n5. Preparing X and y...")
-    X, y = prepare_model_data(df)
+    print("4. Encoding categorical features...")
+    encoded = encode_features(df)
 
-    return X, y, df
+    print("5. Preparing X and y...")
 
+    drop_columns = [c for c in ["date", "target", "origin_port"] if c in encoded.columns]
 
-# ============================================================
-# TEST
-# ============================================================
+    X = encoded.drop(columns=drop_columns)
+    y = encoded["target"]
+
+    return X, y, encoded
+
 
 if __name__ == "__main__":
 
-    X, y, processed_df = preprocess_data()
+    X, y, processed = preprocess_data()
 
-    print("\n========================================")
+    print("\n" + "=" * 46)
     print("PREPROCESSING COMPLETE")
-    print("========================================")
-
-    print(f"\nProcessed dataset shape: {processed_df.shape}")
-
-    print(f"\nX shape: {X.shape}")
-
-    print(f"y shape: {y.shape}")
-
-    print("\nFeatures:")
-    print(X.columns.tolist())
-
-    print("\nFirst 5 X rows:")
-    print(X.head())
-
-    print("\nFirst 5 target values:")
-    print(y.head())
-
-    print("\nTarget statistics:")
-    print(y.describe())
+    print("=" * 46)
+    print(f"\nProcessed shape : {processed.shape}")
+    print(f"X shape         : {X.shape}")
+    print(f"y shape         : {y.shape}")
+    print(f"\nFeature count   : {len(X.columns)}")
+    print(f"Target mean     : {y.mean():.2f}")
+    print(f"Target std      : {y.std():.2f}")

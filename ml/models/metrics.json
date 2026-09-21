@@ -1,0 +1,14 @@
+{
+  "rows_train": 55580,
+  "rows_test": 13860,
+  "cutoff_date": "2025-03-02",
+  "features": 41,
+  "series_count": 4,
+  "model_mae": 1.1662,
+  "naive_mae": 1.2979,
+  "improvement_vs_naive_pct": 10.14,
+  "interval_coverage_q10_q90": 0.7834,
+  "pinball_q10": 0.2728,
+  "pinball_q50": 0.5831,
+  "pinball_q90": 0.2692
+}

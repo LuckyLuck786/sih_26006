@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
-    "freight-charter-dashboard": "file:",
+    "leaflet": "^1.9.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-leaflet": "^5.0.0",
     "recharts": "^3.2.1",
     "tailwindcss": "^4.1.13"
   },

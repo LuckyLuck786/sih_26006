@@ -1,0 +1,22 @@
+# Harborline charter intelligence - Python dependencies
+#
+# macOS note: LightGBM needs the OpenMP runtime, which Apple does not
+# ship. If `import lightgbm` fails with a libomp.dylib error, run:
+#
+#     brew install libomp
+#
+# The service degrades gracefully without trained models, but training
+# requires LightGBM.
+
+# Data and modelling
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.5
+lightgbm>=4.3
+joblib>=1.4
+
+# API service
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.8
+httpx>=0.27

@@ -9,7 +9,8 @@ def monte_carlo_simulation(
     forecast_expected,
     forecast_worst,
     waiting_cost=500,
-    simulations=10000
+    simulations=10000,
+    random_seed=26006
 ):
     """
     Simulate possible future freight rates.
@@ -38,7 +39,12 @@ def monte_carlo_simulation(
     # 2. Generate random samples
     # -----------------------------------------
 
-    random_values = np.random.normal(
+    # Seeded so a demo produces the same distribution twice. An unseeded
+    # simulation made every reload of the dashboard show different
+    # probabilities for identical inputs.
+    rng = np.random.default_rng(random_seed)
+
+    random_values = rng.normal(
         loc=0,
         scale=1,
         size=simulations

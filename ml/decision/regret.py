@@ -54,10 +54,10 @@ def calculate_regret(
 if __name__ == "__main__":
 
     result = calculate_regret(
-    current_rate=5000,
-    actual_future_rate=5300,
-    decision="WAIT",
-    cargo_quantity=50000
-)
+        current_rate=5000,
+        actual_future_rate=5300,
+        decision="WAIT",
+        cargo_quantity=50000,
+    )
 
-print(result)
+    print(result)
