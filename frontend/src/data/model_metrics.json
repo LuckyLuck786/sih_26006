@@ -1,1 +1,33 @@
-{"metrics":{"rows_train":55580,"rows_test":13860,"cutoff_date":"2025-03-02","features":41,"series_count":4,"model_mae":1.1662,"naive_mae":1.2979,"improvement_vs_naive_pct":10.14,"interval_coverage_q10_q90":0.7834,"pinball_q10":0.2728,"pinball_q50":0.5831,"pinball_q90":0.2692},"feature_importance":[{"feature":"freight_rate_rolling_mean_30","importance":407},{"feature":"distance_nm","importance":302},{"feature":"freight_rate","importance":260},{"feature":"season_cos","importance":233},{"feature":"freight_rate_rolling_mean_14","importance":195},{"feature":"season_sin","importance":178},{"feature":"congestion_rolling_mean_7","importance":164},{"feature":"freight_rate_rolling_std_30","importance":142},{"feature":"freight_rate_rolling_mean_7","importance":120},{"feature":"day_of_year","importance":119},{"feature":"vessel_type_Handysize","importance":80},{"feature":"freight_rate_lag_1","importance":68},{"feature":"vessel_type_Capesize","importance":66},{"feature":"freight_rate_lag_14","importance":59},{"feature":"commodity_price","importance":47}]}
+{
+  "metrics": {
+    "rows_train": 55580,
+    "rows_test": 13860,
+    "cutoff_date": "2025-03-02",
+    "features": 41,
+    "series_count": 4,
+    "model_mae": 1.1662,
+    "naive_mae": 1.2979,
+    "improvement_vs_naive_pct": 10.14,
+    "interval_coverage_q10_q90": 0.7834,
+    "pinball_q10": 0.2728,
+    "pinball_q50": 0.5831,
+    "pinball_q90": 0.2692
+  },
+  "feature_importance": [
+    { "feature": "freight_rate_rolling_mean_30", "importance": 407 },
+    { "feature": "distance_nm", "importance": 302 },
+    { "feature": "freight_rate", "importance": 260 },
+    { "feature": "season_cos", "importance": 233 },
+    { "feature": "freight_rate_rolling_mean_14", "importance": 195 },
+    { "feature": "season_sin", "importance": 178 },
+    { "feature": "congestion_rolling_mean_7", "importance": 164 },
+    { "feature": "freight_rate_rolling_std_30", "importance": 142 },
+    { "feature": "freight_rate_rolling_mean_7", "importance": 120 },
+    { "feature": "day_of_year", "importance": 119 },
+    { "feature": "vessel_type_Handysize", "importance": 80 },
+    { "feature": "freight_rate_lag_1", "importance": 68 },
+    { "feature": "vessel_type_Capesize", "importance": 66 },
+    { "feature": "freight_rate_lag_14", "importance": 59 },
+    { "feature": "commodity_price", "importance": 47 }
+  ]
+}

@@ -16,10 +16,14 @@ import ContractStrategy from './components/ContractStrategy'
 import RiskAlerts from './components/RiskAlerts'
 import VoyageMap from './components/VoyageMap'
 import ModelCard from './components/ModelCard'
+import PipelineStrip from './components/PipelineStrip'
+import StatusBar from './components/StatusBar'
 
 import { analyzeShipment } from './services/api'
 import { initialValues } from './lib/shipmentDefaults'
 import { MODEL_METRICS } from './engine'
+import fleet from './data/vessels.json'
+import routes from './data/routes.json'
 
 // Each tab is a lettered requirement of PS 26006, so the dashboard reads
 // in the same order as the problem statement.
@@ -82,6 +86,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col bg-paper text-ink">
       <Header meta={headerMeta} />
+      <StatusBar trace={result?.trace} fleetSize={fleet.length} laneCount={routes.length} />
 
       <main className="mx-auto w-full max-w-[1400px] flex-1 px-5 py-7 lg:px-8">
         <div className="mb-6 max-w-2xl">
@@ -148,6 +153,7 @@ export default function App() {
                           currentRate={result.forecast?.current_rate}
                           horizonDays={result.forecast?.horizon_days}
                         />
+                        <PipelineStrip trace={result.trace} />
                         <ModelCard model={result.model} />
                       </div>
                     )}

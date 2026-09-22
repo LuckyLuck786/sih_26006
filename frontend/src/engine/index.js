@@ -40,6 +40,7 @@ import {
 import { buildRiskReport } from './risk'
 import { charterDecision, monteCarlo, optimalStopping, waitingCost } from './timing'
 import { rankVesselClasses } from './vessels'
+import { createTrace } from './trace'
 
 export { DESTINATIONS, MODEL_METRICS, ORIGINS, PORTS_BY_NAME, resolveRoute, VESSEL_CLASSES }
 export { draftLimitedPayload, rankVesselClasses } from './vessels'
@@ -47,6 +48,7 @@ export { charterDecision, monteCarlo, optimalStopping, waitingCost } from './tim
 export { analyseIdle, estimateBerthWaitDays } from './idle'
 export { compareSpotVsTerm, termPremiumFactor } from './contracts'
 export { buildRiskReport } from './risk'
+export { STAGES } from './trace'
 
 export function analyzeShipmentLocal(payload) {
   const {
@@ -59,7 +61,9 @@ export function analyzeShipmentLocal(payload) {
     annual_carrying_rate: annualCarryingRate = 0.08,
   } = payload
 
-  const route = resolveRoute(origin, destination)
+  const trace = createTrace()
+
+  const route = trace.stage('route', () => resolveRoute(origin, destination))
   if (!route) throw new Error(`No route from ${origin} to ${destination}.`)
 
   const loadPort = PORTS_BY_NAME[route.origin]
@@ -75,12 +79,8 @@ export function analyzeShipmentLocal(payload) {
   const rateValues = Object.values(ratesByClass)
   ratesByClass.default = rateValues.length ? mean(rateValues) : 0
 
-  const vesselResult = rankVesselClasses(
-    loadPort,
-    dischargePort,
-    cargoQuantity,
-    route.distance,
-    ratesByClass,
+  const vesselResult = trace.stage('vessel', () =>
+    rankVesselClasses(loadPort, dischargePort, cargoQuantity, route.distance, ratesByClass),
   )
 
   let chosen = vesselResult.recommended
@@ -100,7 +100,9 @@ export function analyzeShipmentLocal(payload) {
     )
   }
 
-  const forecast = lookupForecast(originCountry, destination, chosen.vessel_type)
+  const forecast = trace.stage('forecast', () =>
+    lookupForecast(originCountry, destination, chosen.vessel_type),
+  )
   if (!forecast) throw new Error('No forecast available for this lane.')
 
   const horizonDays = forecast.horizon_days || 14
@@ -112,54 +114,66 @@ export function analyzeShipmentLocal(payload) {
     horizonDays,
   )
 
-  const wait = waitingCost({ cargoQuantity, cargoValuePerTon, annualCarryingRate })
+  const wait = trace.stage('waiting', () =>
+    waitingCost({ cargoQuantity, cargoValuePerTon, annualCarryingRate }),
+  )
   const waitPerTonneDay = wait.waiting_cost_per_tonne_day
   const waitOverHorizon = waitPerTonneDay * horizonDays
 
-  const decision = charterDecision(
-    forecast.current_rate,
-    forecast.best,
-    forecast.expected,
-    forecast.worst,
-    waitOverHorizon,
+  const decision = trace.stage('decision', () =>
+    charterDecision(
+      forecast.current_rate,
+      forecast.best,
+      forecast.expected,
+      forecast.worst,
+      waitOverHorizon,
+    ),
   )
 
-  const simulation = monteCarlo(
-    forecast.current_rate,
-    forecast.best,
-    forecast.expected,
-    forecast.worst,
-    waitOverHorizon,
+  const simulation = trace.stage('montecarlo', () =>
+    monteCarlo(
+      forecast.current_rate,
+      forecast.best,
+      forecast.expected,
+      forecast.worst,
+      waitOverHorizon,
+    ),
   )
 
-  const timing = optimalStopping(
-    forecast.current_rate,
-    forecast.expected,
-    forecast.best,
-    forecast.worst,
-    waitPerTonneDay,
-    horizonDays,
+  const timing = trace.stage('stopping', () =>
+    optimalStopping(
+      forecast.current_rate,
+      forecast.expected,
+      forecast.best,
+      forecast.worst,
+      waitPerTonneDay,
+      horizonDays,
+    ),
   )
 
   const loadCongestion = Math.min(forecast.congestion * 1.1, 0.95)
 
-  const idle = analyseIdle(
-    chosen.vessel_type,
-    chosen.tonnes_per_voyage,
-    loadPort,
-    dischargePort,
-    chosen.sea_days,
-    loadCongestion,
-    forecast.congestion,
+  const idle = trace.stage('idle', () =>
+    analyseIdle(
+      chosen.vessel_type,
+      chosen.tonnes_per_voyage,
+      loadPort,
+      dischargePort,
+      chosen.sea_days,
+      loadCongestion,
+      forecast.congestion,
+    ),
   )
 
-  const contract = compareSpotVsTerm({
-    series: series.map((p) => p.expected),
-    cargoQuantity,
-    contractDays: contractDuration,
-    voyagesRequired: chosen.voyages_required,
-    volatility: Math.max(forecast.volatility, forecast.current_rate * 0.03),
-  })
+  const contract = trace.stage('contract', () =>
+    compareSpotVsTerm({
+      series: series.map((p) => p.expected),
+      cargoQuantity,
+      contractDays: contractDuration,
+      voyagesRequired: chosen.voyages_required,
+      volatility: Math.max(forecast.volatility, forecast.current_rate * 0.03),
+    }),
+  )
 
   const openVessels = FLEET.filter(
     (v) =>
@@ -168,23 +182,40 @@ export function analyzeShipmentLocal(payload) {
       v.vessel_type === chosen.vessel_type,
   )
 
-  const risk = buildRiskReport({
-    best: forecast.best,
-    expected: forecast.expected,
-    worst: forecast.worst,
-    loadPort,
-    dischargePort,
-    loadCongestion,
-    dischargeCongestion: forecast.congestion,
-    vesselSupply: forecast.vessel_supply,
-    availableVessels: openVessels.length,
-    netExpectedSaving: decision.net_expected_saving,
-    waitingCost: waitOverHorizon,
-    probabilityWaitingWins: timing.probability_waiting_wins,
-    recentVolatility: forecast.volatility,
-  })
+  const risk = trace.stage('risk', () =>
+    buildRiskReport({
+      best: forecast.best,
+      expected: forecast.expected,
+      worst: forecast.worst,
+      loadPort,
+      dischargePort,
+      loadCongestion,
+      dischargeCongestion: forecast.congestion,
+      vesselSupply: forecast.vessel_supply,
+      availableVessels: openVessels.length,
+      netExpectedSaving: decision.net_expected_saving,
+      waitingCost: waitOverHorizon,
+      probabilityWaitingWins: timing.probability_waiting_wins,
+      recentVolatility: forecast.volatility,
+    }),
+  )
+
+  trace.annotate('route', `${route.distance.toLocaleString()} nm`)
+  trace.annotate('forecast', `${forecast.source === 'model' ? 'LightGBM' : 'fallback'}`)
+  trace.annotate(
+    'vessel',
+    `${vesselResult.ranked.length} feasible, ${vesselResult.rejected.length} rejected`,
+  )
+  trace.annotate('montecarlo', `${simulation.simulations.toLocaleString()} paths`)
+  trace.annotate('stopping', `${timing.simulations.toLocaleString()} paths x ${horizonDays}d`)
+  trace.annotate('idle', `${idle.idle_days}d idle`)
+  trace.annotate('contract', `${contract.recommendation}`)
+  trace.annotate('risk', `${risk.alert_count} alert(s)`)
+  trace.annotate('decision', decision.decision)
+  trace.annotate('waiting', `$${wait.waiting_cost_per_tonne_day}/t/day`)
 
   return {
+    trace: trace.summary(),
     request: {
       origin,
       origin_country: originCountry,
