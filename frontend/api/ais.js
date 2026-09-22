@@ -73,9 +73,20 @@ export default async function handler(request, response) {
     clearTimeout(timeout)
 
     if (!upstream.ok) {
+      // Data Docked returns 400 for several unrelated conditions — a bad
+      // parameter, a spent balance, a rate limit. Passing the body through
+      // is the only way to tell them apart; it contains no credentials.
+      let detail = ''
+      try {
+        detail = (await upstream.text()).slice(0, 300)
+      } catch {
+        detail = ''
+      }
+
       return response.status(200).json({
         source: 'simulated',
         reason: `upstream_${upstream.status}`,
+        upstream_body: detail,
         vessels: [],
       })
     }
