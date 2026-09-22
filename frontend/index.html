@@ -3,11 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#071b2a" />
-    <title>Harborline | Charter Intelligence</title>
+
+    <title>Harborline | Charter entry timing and vessel selection</title>
+    <meta
+      name="description"
+      content="Decision support for dry bulk chartering into the East Coast of India: when to fix, which vessel class the ports permit, projected idle time, and spot versus term."
+    />
+
+    <!-- Navy from the design tokens, so the mobile browser chrome matches
+         the masthead rather than the pre-redesign colour. -->
+    <meta name="theme-color" content="#10243a" />
+    <meta name="color-scheme" content="light" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://sih-prototype-seven-psi.vercel.app/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Harborline | Charter Intelligence" />
+    <meta
+      property="og:description"
+      content="Freight forecasting and charter decision support for bulk cargo procurement to India's East Coast ports."
+    />
+    <meta property="og:url" content="https://sih-prototype-seven-psi.vercel.app/" />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- Both font origins are preconnected because the stylesheet on
+         googleapis immediately requests the faces from gstatic. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      Harborline computes the charter decision in your browser, so JavaScript is required.
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

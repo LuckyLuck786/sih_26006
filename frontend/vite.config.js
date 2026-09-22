@@ -12,8 +12,9 @@ export default defineConfig({
         // change far less often than application code. Splitting them out
         // keeps the app chunk small and lets browsers reuse the vendor
         // chunks across deploys.
+        // React is not split out: it ends up inside the entry chunk
+        // either way and a separate entry for it emitted a 0.00 kB file.
         manualChunks: {
-          react: ['react', 'react-dom'],
           charts: ['recharts'],
           maps: ['leaflet', 'react-leaflet'],
         },

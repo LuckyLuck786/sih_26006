@@ -192,6 +192,19 @@ Maps use **OpenStreetMap** tiles, which need no key or account.
 
 ---
 
+## Security headers
+
+`frontend/vercel.json` sets CSP, `X-Frame-Options`, `X-Content-Type-Options`,
+`Referrer-Policy`, `Permissions-Policy` and `Cross-Origin-Opener-Policy`.
+
+The policy allows Google Fonts and OpenStreetMap tiles, and nothing else off-origin.
+`script-src` is `'self'` with no `unsafe-inline`: the production build emits no inline
+script. `style-src` does carry `'unsafe-inline'`, because Leaflet and Recharts set inline
+style attributes on the elements they render and the map and charts do not work without
+it. That is a real weakening of the policy and is recorded here rather than left implicit.
+
+---
+
 ## Layout
 
 ```

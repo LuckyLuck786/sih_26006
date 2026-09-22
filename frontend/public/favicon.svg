@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Harborline">
+  <!--
+    Draft marks on a hull.
+
+    The product's central constraint is how deep a vessel sits and which
+    ports will therefore take it, so the mark is a load line: the scale
+    painted on a hull amidships that says how far down she may be loaded.
+  -->
+  <rect width="32" height="32" fill="#10243a"/>
+
+  <!-- Draft scale, ascending -->
+  <g fill="#fbfaf7">
+    <rect x="7" y="8"  width="7" height="1.6"/>
+    <rect x="7" y="13" width="5" height="1.6"/>
+    <rect x="7" y="18" width="7" height="1.6"/>
+  </g>
+
+  <!-- Plimsoll disc and its line, the mark itself -->
+  <circle cx="21" cy="14" r="4.2" fill="none" stroke="#fbfaf7" stroke-width="1.6"/>
+  <rect x="15.5" y="13.2" width="11" height="1.6" fill="#fbfaf7"/>
+
+  <!-- Waterline -->
+  <rect x="4" y="24" width="24" height="1.6" fill="#8b929c"/>
+</svg>
