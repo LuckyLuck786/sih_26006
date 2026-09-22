@@ -19,25 +19,21 @@
 
 const DATADOCKED_BASE = 'https://datadocked.com/api/vessels_operations'
 
-// The free tier is metered, so identical lookups within this window are
+const DEFAULT_RADIUS_NM = 50
+
+// The account is metered, so identical lookups within this window are
 // served from memory rather than spending another credit. Serverless
 // instances are recycled, which makes this a best-effort cache.
-const SUPPORTED_RADIUS_NM = 50
-
 const CACHE_TTL_MS = 10 * 60 * 1000
 const cache = new Map()
 
 export default async function handler(request, response) {
-  const { latitude, longitude } = request.query || {}
+  const { latitude, longitude, radius } = request.query || {}
 
   const lat = Number(latitude)
   const lon = Number(longitude)
 
-  // Data Docked rejects every circle_radius except 50 with HTTP 400 —
-  // the parameter is documented as a free integer but is not one. The
-  // value is pinned rather than passed through so a caller asking for a
-  // wider sweep degrades to a working request instead of an error.
-  const circleRadius = SUPPORTED_RADIUS_NM
+  const circleRadius = Math.min(Math.max(parseInt(radius, 10) || DEFAULT_RADIUS_NM, 1), 500)
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
     return response.status(400).json({ error: 'latitude and longitude are required' })
@@ -73,9 +69,11 @@ export default async function handler(request, response) {
     clearTimeout(timeout)
 
     if (!upstream.ok) {
-      // Data Docked returns 400 for several unrelated conditions — a bad
-      // parameter, a spent balance, a rate limit. Passing the body through
-      // is the only way to tell them apart; it contains no credentials.
+      // Data Docked returns 400 for several unrelated conditions. A spent
+      // balance reports as
+      //   {"detail":"Not enough credits or endpoint in black list."}
+      // which is indistinguishable from a bad parameter without the body,
+      // so it is passed through. It contains no credentials.
       let detail = ''
       try {
         detail = (await upstream.text()).slice(0, 300)
