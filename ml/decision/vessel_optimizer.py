@@ -179,7 +179,7 @@ def assess_class(
 
     if utilisation < 0.6:
         notes.append(
-            f"Only {utilisation * 100:.0f}% of deadweight used — parcel is small for this class"
+            f"Only {utilisation * 100:.0f}% of deadweight used. Parcel is small for this class"
         )
 
     if payload < spec["dwt"] * 0.95:

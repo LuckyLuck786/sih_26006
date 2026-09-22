@@ -46,7 +46,7 @@ export default function ModelCard({ model }) {
       title="Forecast accuracy"
       subtitle={`LightGBM quantile regression · ${metrics.rows_train?.toLocaleString()} training rows, ${metrics.features} features`}
       right={
-        <Pill tone={beatsNaive ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
+        <Pill tone={beatsNaive ? 'bg-surface text-positive' : 'bg-surface text-caution'}>
           {beatsNaive
             ? `${metrics.improvement_vs_naive_pct}% better than naive`
             : 'At parity with naive'}
@@ -54,41 +54,41 @@ export default function ModelCard({ model }) {
       }
     >
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl bg-slate-50 p-3.5">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">Model error</p>
-          <p className="mt-1 text-xl font-black text-slate-900">${metrics.model_mae}/t</p>
-          <p className="text-xs text-slate-400">mean absolute error</p>
+        <div className="bg-sunken p-3.5">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">Model error</p>
+          <p className="mt-1 text-xl font-black text-ink">${metrics.model_mae}/t</p>
+          <p className="text-xs text-ink-faint">mean absolute error</p>
         </div>
-        <div className="rounded-xl bg-slate-50 p-3.5">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+        <div className="bg-sunken p-3.5">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
             Naive baseline
           </p>
-          <p className="mt-1 text-xl font-black text-slate-500">${metrics.naive_mae}/t</p>
-          <p className="text-xs text-slate-400">&ldquo;tomorrow equals today&rdquo;</p>
+          <p className="mt-1 text-xl font-black text-ink-muted">${metrics.naive_mae}/t</p>
+          <p className="text-xs text-ink-faint">&ldquo;tomorrow equals today&rdquo;</p>
         </div>
-        <div className="rounded-xl bg-slate-50 p-3.5">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+        <div className="bg-sunken p-3.5">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
             Band coverage
           </p>
-          <p className="mt-1 text-xl font-black text-slate-900">{percent(coverage)}</p>
-          <p className="text-xs text-slate-400">of actuals inside Q10–Q90 (target 80%)</p>
+          <p className="mt-1 text-xl font-black text-ink">{percent(coverage)}</p>
+          <p className="text-xs text-ink-faint">of actuals inside Q10–Q90 (target 80%)</p>
         </div>
       </div>
 
       {top.length > 0 && (
-        <div className="mt-5 border-t border-slate-100 pt-4">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+        <div className="mt-5 border-t border-rule pt-4">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
             What drives the forecast
           </p>
           <ul className="mt-3 space-y-2">
             {top.map((feature) => (
               <li key={feature.feature} className="flex items-center gap-3">
-                <span className="w-44 shrink-0 truncate text-xs text-slate-600">
+                <span className="w-44 shrink-0 truncate text-xs text-ink-muted">
                   {PRETTY[feature.feature] || feature.feature}
                 </span>
-                <span className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                <span className="h-2 flex-1 overflow-hidden rounded-full bg-sunken">
                   <span
-                    className="block h-full rounded-full bg-teal-500"
+                    className="block h-full rounded-full bg-navy"
                     style={{ width: `${(feature.importance / peak) * 100}%` }}
                   />
                 </span>
@@ -98,7 +98,7 @@ export default function ModelCard({ model }) {
         </div>
       )}
 
-      <p className="mt-4 text-xs leading-5 text-slate-400">
+      <p className="mt-4 text-xs leading-5 text-ink-faint">
         Held-out test set from {metrics.cutoff_date} onward ({metrics.rows_test?.toLocaleString()}{' '}
         rows), split by date so the model never sees the future. Forecast horizon 14 days.
       </p>

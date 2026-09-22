@@ -11,10 +11,10 @@ export default function IdlePanel({ idle }) {
   if (!idle) return null
 
   const segments = [
-    { label: 'Laden', value: idle.sea_days_laden, tone: 'bg-teal-600', earning: true },
-    { label: 'Loading', value: idle.load_days, tone: 'bg-teal-400', earning: true },
-    { label: 'Discharge', value: idle.discharge_days, tone: 'bg-teal-300', earning: true },
-    { label: 'Ballast', value: idle.ballast_days, tone: 'bg-slate-400', earning: false },
+    { label: 'Laden', value: idle.sea_days_laden, tone: 'bg-navy', earning: true },
+    { label: 'Loading', value: idle.load_days, tone: 'bg-navy', earning: true },
+    { label: 'Discharge', value: idle.discharge_days, tone: 'bg-navy-soft', earning: true },
+    { label: 'Ballast', value: idle.ballast_days, tone: 'bg-ink-faint', earning: false },
     {
       label: 'Berth wait',
       value: (idle.load_berth_wait_days || 0) + (idle.discharge_berth_wait_days || 0),
@@ -32,17 +32,13 @@ export default function IdlePanel({ idle }) {
       subtitle="Where the non-earning time goes, and what to do about it"
       right={
         <Pill
-          tone={
-            idle.idle_share > 0.45
-              ? 'bg-orange-100 text-orange-800'
-              : 'bg-emerald-100 text-emerald-800'
-          }
+          tone={idle.idle_share > 0.45 ? 'bg-surface text-caution' : 'bg-surface text-positive'}
         >
           {percent(idle.idle_share)} non-earning
         </Pill>
       }
     >
-      <div className="flex h-7 w-full overflow-hidden rounded-lg">
+      <div className="flex h-7 w-full overflow-hidden">
         {segments.map((segment) => (
           <div
             key={segment.label}
@@ -57,11 +53,11 @@ export default function IdlePanel({ idle }) {
         {segments.map((segment) => (
           <span
             key={segment.label}
-            className="flex items-center gap-1.5 text-[11px] text-slate-600"
+            className="flex items-center gap-1.5 text-[11px] text-ink-muted"
           >
-            <span className={`h-2.5 w-2.5 rounded-sm ${segment.tone}`} />
+            <span className={`h-2.5 w-2.5 ${segment.tone}`} />
             {segment.label} {segment.value.toFixed(1)}d
-            {!segment.earning && <span className="text-slate-400">(idle)</span>}
+            {!segment.earning && <span className="text-ink-faint">(idle)</span>}
           </span>
         ))}
       </div>
@@ -76,22 +72,22 @@ export default function IdlePanel({ idle }) {
           label="Berth queue"
           value={`${idle.discharge_berth_wait_days} d`}
           hint="at the discharge port"
-          tone={idle.discharge_berth_wait_days > 2 ? 'text-orange-700' : 'text-slate-900'}
+          tone={idle.discharge_berth_wait_days > 2 ? 'text-caution' : 'text-ink'}
         />
         <Stat
           label="Demurrage exposure"
           value={money(idle.demurrage_cost_usd)}
           hint={`${idle.demurrage_days} days beyond laytime`}
-          tone={idle.demurrage_cost_usd > 0 ? 'text-red-700' : 'text-emerald-700'}
+          tone={idle.demurrage_cost_usd > 0 ? 'text-negative' : 'text-positive'}
         />
       </div>
 
       {idle.recommendations?.length > 0 && (
-        <ul className="mt-5 space-y-2 border-t border-slate-100 pt-4">
+        <ul className="mt-5 space-y-2 border-t border-rule pt-4">
           {idle.recommendations.map((item) => (
-            <li key={item.type} className="flex gap-2.5 text-xs leading-5 text-slate-700">
+            <li key={item.type} className="flex gap-2.5 text-xs leading-5 text-ink">
               <span
-                className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${SEVERITY_DOT[item.severity] || 'bg-slate-400'}`}
+                className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${SEVERITY_DOT[item.severity] || 'bg-ink-faint'}`}
               />
               {item.message}
             </li>

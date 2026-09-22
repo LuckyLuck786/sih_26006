@@ -76,7 +76,7 @@ function assessClass(spec, loadPort, dischargePort, cargoQuantity, distanceNm, r
   const notes = []
   if (utilisation < 0.6) {
     notes.push(
-      `Only ${Math.round(utilisation * 100)}% of deadweight used — parcel is small for this class`,
+      `Only ${Math.round(utilisation * 100)}% of deadweight used. Parcel is small for this class`,
     )
   }
   if (payload < spec.dwt * 0.95) {

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 import Header from './components/Header'
+import Footer from './components/Footer'
 import InputPanel from './components/InputPanel'
-import { initialValues } from './lib/shipmentDefaults'
 import ResultCards from './components/ResultCards'
 import DecisionBanner from './components/DecisionBanner'
 import ForecastChart from './components/ForecastChart'
@@ -18,16 +18,18 @@ import VoyageMap from './components/VoyageMap'
 import ModelCard from './components/ModelCard'
 
 import { analyzeShipment } from './services/api'
+import { initialValues } from './lib/shipmentDefaults'
+import { MODEL_METRICS } from './engine'
 
-// Each tab maps to a lettered requirement of PS 26006, so the structure
-// of the dashboard mirrors the structure of the problem statement.
+// Each tab is a lettered requirement of PS 26006, so the dashboard reads
+// in the same order as the problem statement.
 const TABS = [
-  { id: 'decision', label: 'Decision', hint: 'Forecast & charter call' },
-  { id: 'timing', label: 'Timing', hint: 'Requirement (a)' },
-  { id: 'vessel', label: 'Vessel', hint: 'Requirement (b)' },
-  { id: 'idle', label: 'Idle time', hint: 'Requirement (c)' },
-  { id: 'risk', label: 'Risk', hint: 'Requirement (d)' },
-  { id: 'contract', label: 'Contract', hint: 'Spot vs term' },
+  { id: 'decision', label: 'Decision' },
+  { id: 'timing', label: 'Timing', note: 'a' },
+  { id: 'vessel', label: 'Vessel', note: 'b' },
+  { id: 'idle', label: 'Idle time', note: 'c' },
+  { id: 'risk', label: 'Risk', note: 'd' },
+  { id: 'contract', label: 'Contract' },
 ]
 
 export default function App() {
@@ -64,28 +66,36 @@ export default function App() {
 
   const retry = () => lastPayload && submit(lastPayload)
 
-  const decision = result?.decision?.decision || ''
-  const reason = result?.decision?.reason || ''
+  const metrics = MODEL_METRICS?.metrics
+
+  const headerMeta = [
+    {
+      label: 'Lane',
+      value: result
+        ? `${result.route.load_port_unlocode}/${result.route.discharge_port_unlocode}`
+        : 'not set',
+    },
+    { label: 'Horizon', value: `${result?.forecast?.horizon_days ?? 14}d` },
+    { label: 'Model MAE', value: metrics ? `$${metrics.model_mae}/t` : 'n/a' },
+  ]
 
   return (
-    <div className="min-h-screen bg-[#f3f7f8] text-slate-900">
-      <Header />
+    <div className="flex min-h-screen flex-col bg-paper text-ink">
+      <Header meta={headerMeta} />
 
-      <main className="mx-auto max-w-7xl px-5 py-8 lg:px-8 lg:py-10">
-        <div className="mb-8 max-w-3xl">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700">
-            East Coast India · Dry bulk · SIH PS 26006
-          </p>
-          <h1 className="font-display mt-2 text-4xl font-black tracking-tight text-[#071b2a] sm:text-5xl">
-            Make the next charter count.
+      <main className="mx-auto w-full max-w-[1400px] flex-1 px-5 py-7 lg:px-8">
+        <div className="mb-6 max-w-2xl">
+          <p className="label">East Coast India · Dry bulk · SIH PS 26006</p>
+          <h1 className="mt-2 text-2xl font-semibold leading-tight tracking-tight text-ink sm:text-[28px]">
+            Charter entry timing, vessel selection and contract structure
           </h1>
-          <p className="mt-3 text-base leading-7 text-slate-600">
-            Turn live shipment assumptions into a clear, defensible freight decision — when to fix,
-            which vessel class, and whether to go spot or term.
+          <p className="mt-2 text-[13px] leading-6 text-ink-muted">
+            Enter a cargo parcel and lane. The desk returns when to fix, which vessel class the
+            ports actually permit, what the voyage will idle, and whether to go spot or term.
           </p>
         </div>
 
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(300px,1fr)_minmax(0,2.3fr)]">
+        <div className="grid items-start gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
           <InputPanel values={values} onChange={setValues} onSubmit={submit} loading={loading} />
 
           <section aria-live="polite" className="min-w-0">
@@ -94,33 +104,44 @@ export default function App() {
             ) : error ? (
               <ErrorState message={error} onRetry={retry} />
             ) : (
-              <div className="space-y-4">
-                <DecisionBanner decision={decision} reason={reason} placeholder={!result} />
+              <div className="space-y-3">
+                <DecisionBanner
+                  decision={result?.decision?.decision || ''}
+                  reason={result?.decision?.reason || ''}
+                  placeholder={!result}
+                />
 
-                {result && (
+                {result ? (
                   <>
-                    {/* Tabs only appear once there is something to show, so
-                        the empty state stays as simple as it was before. */}
-                    <nav className="flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm">
+                    <nav className="rule flex gap-px border bg-rule">
                       {TABS.map((item) => (
                         <button
                           key={item.id}
                           type="button"
                           onClick={() => setTab(item.id)}
-                          title={item.hint}
-                          className={`shrink-0 rounded-lg px-3.5 py-2 text-sm font-bold transition ${
+                          aria-current={tab === item.id ? 'page' : undefined}
+                          className={`flex-1 px-3 py-2 text-xs font-semibold transition-colors ${
                             tab === item.id
-                              ? 'bg-teal-600 text-white shadow'
-                              : 'text-slate-600 hover:bg-slate-100'
+                              ? 'bg-navy text-white'
+                              : 'bg-surface text-ink-muted hover:bg-sunken hover:text-ink'
                           }`}
                         >
                           {item.label}
+                          {item.note && (
+                            <span
+                              className={
+                                tab === item.id ? 'ml-1 text-white/55' : 'ml-1 text-ink-faint'
+                              }
+                            >
+                              ({item.note})
+                            </span>
+                          )}
                         </button>
                       ))}
                     </nav>
 
                     {tab === 'decision' && (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <ResultCards result={result} />
                         <ForecastChart
                           series={result.forecast_series}
@@ -132,7 +153,7 @@ export default function App() {
                     )}
 
                     {tab === 'timing' && (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <OptimalTiming timing={result.optimal_timing} />
                         <ForecastChart
                           series={result.forecast_series}
@@ -143,7 +164,7 @@ export default function App() {
                     )}
 
                     {tab === 'vessel' && (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         <VesselRanking
                           recommendation={result.vessel_recommendation}
                           route={result.route}
@@ -153,14 +174,10 @@ export default function App() {
                     )}
 
                     {tab === 'idle' && <IdlePanel idle={result.idle} />}
-
                     {tab === 'risk' && <RiskAlerts risk={result.risk} />}
-
                     {tab === 'contract' && <ContractStrategy contract={result.contract_strategy} />}
                   </>
-                )}
-
-                {!result && (
+                ) : (
                   <>
                     <ResultCards result={null} />
                     <ForecastChart series={[]} />
@@ -171,6 +188,8 @@ export default function App() {
           </section>
         </div>
       </main>
+
+      <Footer />
     </div>
   )
 }

@@ -37,18 +37,33 @@ export const days = (value) => (blank(value) ? '—' : `${Number(value).toFixed(
 export const percent = (value, dp = 0) =>
   blank(value) ? '—' : `${(Number(value) * 100).toFixed(dp)}%`
 
+/*
+ * Severity tokens.
+ *
+ * Severity is carried by the left rule and the label tone, never by a
+ * filled background: a page of tinted cards stops reading as data. The
+ * four levels stay distinguishable without introducing new hues.
+ */
 export const SEVERITY_STYLES = {
-  critical: 'border-red-300 bg-red-50 text-red-900',
-  high: 'border-orange-300 bg-orange-50 text-orange-900',
-  medium: 'border-amber-300 bg-amber-50 text-amber-900',
-  low: 'border-emerald-300 bg-emerald-50 text-emerald-900',
-  info: 'border-sky-300 bg-sky-50 text-sky-900',
+  critical: 'border-l-negative bg-surface',
+  high: 'border-l-caution bg-surface',
+  medium: 'border-l-rule-strong bg-surface',
+  low: 'border-l-positive bg-surface',
+  info: 'border-l-navy bg-surface',
+}
+
+export const SEVERITY_LABEL_TONE = {
+  critical: 'text-negative',
+  high: 'text-caution',
+  medium: 'text-ink',
+  low: 'text-positive',
+  info: 'text-navy',
 }
 
 export const SEVERITY_DOT = {
-  critical: 'bg-red-500',
-  high: 'bg-orange-500',
-  medium: 'bg-amber-500',
-  low: 'bg-emerald-500',
-  info: 'bg-sky-500',
+  critical: 'bg-negative',
+  high: 'bg-caution',
+  medium: 'bg-rule-strong',
+  low: 'bg-positive',
+  info: 'bg-navy',
 }

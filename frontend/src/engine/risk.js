@@ -90,7 +90,7 @@ export function buildRiskReport(opts) {
         'congestion',
         'medium',
         `Watch congestion at ${port.port}`,
-        `${port.port} is at ${Math.round(congestion * 100)}% utilisation — manageable now, but worth monitoring before fixing.`,
+        `${port.port} is at ${Math.round(congestion * 100)}% utilisation. Manageable now, but worth monitoring before fixing.`,
         round(congestion, 2),
       )
     }
@@ -110,7 +110,7 @@ export function buildRiskReport(opts) {
         'supply',
         'info',
         'Ample tonnage available',
-        `${vesselSupply} vessels are open on this lane. Competition favours the charterer — there is room to negotiate.`,
+        `${vesselSupply} vessels are open on this lane. Competition favours the charterer, so there is room to negotiate.`,
         vesselSupply,
       )
     }
@@ -145,7 +145,7 @@ export function buildRiskReport(opts) {
       'decision',
       'medium',
       'Low conviction on timing',
-      `Waiting beats fixing in only ${Math.round(probabilityWaitingWins * 100)}% of simulated markets — close to a coin flip. Prefer the option that preserves flexibility.`,
+      `Waiting beats fixing in only ${Math.round(probabilityWaitingWins * 100)}% of simulated markets, close to a coin flip. Prefer the option that preserves flexibility.`,
       round(probabilityWaitingWins, 3),
     )
   }

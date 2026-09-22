@@ -31,13 +31,11 @@ export default function VesselRanking({ recommendation, route }) {
           : undefined
       }
       right={
-        saving ? (
-          <Pill tone="bg-emerald-100 text-emerald-800">{money(saving)} vs next best</Pill>
-        ) : null
+        saving ? <Pill tone="bg-surface text-positive">{money(saving)} vs next best</Pill> : null
       }
     >
       {infeasible && (
-        <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
+        <div className="mb-4 border border-caution bg-surface p-3 text-xs leading-5 text-caution">
           <strong>{infeasible.vessel_type} cannot serve this lane.</strong>{' '}
           {infeasible.reasons?.[0]}. Showing the optimiser's choice instead.
         </div>
@@ -46,7 +44,7 @@ export default function VesselRanking({ recommendation, route }) {
       <div className="-mx-1 overflow-x-auto">
         <table className="w-full min-w-[620px] border-collapse text-sm">
           <thead>
-            <tr className="border-b border-slate-200 text-left text-[11px] uppercase tracking-[0.08em] text-slate-500">
+            <tr className="border-b border-rule text-left text-[11px] uppercase tracking-[0.08em] text-ink-muted">
               <th className="py-2 pr-3 font-bold">#</th>
               <th className="py-2 pr-3 font-bold">Class</th>
               <th className="py-2 pr-3 text-right font-bold">All-in $/t</th>
@@ -63,36 +61,30 @@ export default function VesselRanking({ recommendation, route }) {
               return (
                 <tr
                   key={option.vessel_type}
-                  className={`border-b border-slate-100 ${isChosen ? 'bg-teal-50/70' : ''}`}
+                  className={`border-b border-rule ${isChosen ? 'bg-sunken' : ''}`}
                 >
-                  <td className="py-2.5 pr-3 font-bold text-slate-400">{option.rank}</td>
+                  <td className="py-2.5 pr-3 font-bold text-ink-faint">{option.rank}</td>
                   <td className="py-2.5 pr-3">
-                    <span className="font-bold text-slate-900">{option.vessel_type}</span>
+                    <span className="font-bold text-ink">{option.vessel_type}</span>
                     {isChosen && (
-                      <span className="ml-2 text-[10px] font-bold text-teal-700">PICKED</span>
+                      <span className="ml-2 text-[10px] font-bold text-navy">PICKED</span>
                     )}
-                    <span className="block text-[11px] text-slate-400">
+                    <span className="block text-[11px] text-ink-faint">
                       {option.dwt.toLocaleString()} dwt
                     </span>
                   </td>
-                  <td className="py-2.5 pr-3 text-right font-bold text-slate-900">
+                  <td className="py-2.5 pr-3 text-right font-bold text-ink">
                     {rate(option.cost_per_tonne_usd)}
                   </td>
-                  <td className="py-2.5 pr-3 text-right text-slate-700">
+                  <td className="py-2.5 pr-3 text-right text-ink">
                     {tonnes(option.max_payload_tonnes)}
                   </td>
-                  <td className="py-2.5 pr-3 text-right text-slate-700">
+                  <td className="py-2.5 pr-3 text-right text-ink">
                     {percent(option.payload_utilisation)}
                   </td>
-                  <td className="py-2.5 pr-3 text-right text-slate-700">
-                    {option.voyages_required}
-                  </td>
-                  <td className="py-2.5 pr-3 text-right text-slate-700">
-                    {option.round_trip_days} d
-                  </td>
-                  <td className="py-2.5 text-right text-slate-700">
-                    {money(option.total_cost_usd)}
-                  </td>
+                  <td className="py-2.5 pr-3 text-right text-ink">{option.voyages_required}</td>
+                  <td className="py-2.5 pr-3 text-right text-ink">{option.round_trip_days} d</td>
+                  <td className="py-2.5 text-right text-ink">{money(option.total_cost_usd)}</td>
                 </tr>
               )
             })}
@@ -103,8 +95,8 @@ export default function VesselRanking({ recommendation, route }) {
       {chosen?.notes?.length > 0 && (
         <ul className="mt-4 space-y-1.5">
           {chosen.notes.map((note) => (
-            <li key={note} className="flex gap-2 text-xs leading-5 text-slate-600">
-              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-500" />
+            <li key={note} className="flex gap-2 text-xs leading-5 text-ink-muted">
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-navy" />
               {note}
             </li>
           ))}
@@ -112,15 +104,15 @@ export default function VesselRanking({ recommendation, route }) {
       )}
 
       {rejected.length > 0 && (
-        <div className="mt-5 border-t border-slate-100 pt-4">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+        <div className="mt-5 border-t border-rule pt-4">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
             Excluded by port infrastructure
           </p>
           <ul className="mt-2 space-y-2">
             {rejected.map((option) => (
               <li
                 key={option.vessel_type}
-                className="flex flex-wrap items-baseline gap-x-2 rounded-lg bg-red-50 px-3 py-2 text-xs leading-5 text-red-900"
+                className="flex flex-wrap items-baseline gap-x-2 bg-surface px-3 py-2 text-xs leading-5 text-negative"
               >
                 <strong className="font-bold">{option.vessel_type}</strong>
                 <span>{option.reasons?.join('; ')}</span>

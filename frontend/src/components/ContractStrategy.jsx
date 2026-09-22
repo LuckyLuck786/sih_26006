@@ -41,7 +41,7 @@ export default function ContractStrategy({ contract }) {
       title={pickTerm ? 'Fix a term contract' : 'Stay on spot'}
       subtitle="Risk-adjusted comparison across the contract period"
       right={
-        <Pill tone={pickTerm ? 'bg-indigo-100 text-indigo-800' : 'bg-teal-100 text-teal-800'}>
+        <Pill tone={pickTerm ? 'bg-sunken text-navy' : 'bg-sunken text-navy'}>
           {contract.recommendation}
         </Pill>
       }
@@ -52,18 +52,18 @@ export default function ContractStrategy({ contract }) {
           return (
             <div
               key={option.key}
-              className={`rounded-xl border p-4 ${chosen ? 'border-teal-400 bg-teal-50/60' : 'border-slate-200 bg-white'}`}
+              className={` border p-4 ${chosen ? 'border-navy bg-sunken' : 'border-rule bg-surface'}`}
             >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <strong className="text-sm font-bold text-slate-900">{option.title}</strong>
-                <span className="text-lg font-black text-slate-900">{money(option.expected)}</span>
+                <strong className="text-sm font-bold text-ink">{option.title}</strong>
+                <span className="text-lg font-black text-ink">{money(option.expected)}</span>
               </div>
 
               {/* Range bar: where the outcome can land. A term deal is a
                   single point because the rate is fixed. */}
-              <div className="relative mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+              <div className="relative mt-3 h-2 overflow-hidden rounded-full bg-sunken">
                 <div
-                  className={`absolute h-full rounded-full ${chosen ? 'bg-teal-500' : 'bg-slate-300'}`}
+                  className={`absolute h-full rounded-full ${chosen ? 'bg-navy' : 'bg-rule-strong'}`}
                   style={{
                     left: `${(option.best / scale) * 100}%`,
                     width: `${Math.max(((option.worst - option.best) / scale) * 100, 1.5)}%`,
@@ -71,52 +71,48 @@ export default function ContractStrategy({ contract }) {
                 />
               </div>
 
-              <div className="mt-2 flex justify-between text-[11px] text-slate-500">
+              <div className="mt-2 flex justify-between text-[11px] text-ink-muted">
                 <span>{money(option.best)} best</span>
                 <span>{money(option.worst)} worst</span>
               </div>
 
-              <p className="mt-2 text-xs leading-5 text-slate-500">{option.note}</p>
+              <p className="mt-2 text-xs leading-5 text-ink-muted">{option.note}</p>
             </div>
           )
         })}
       </div>
 
-      <div className="mt-5 grid gap-4 border-t border-slate-100 pt-4 sm:grid-cols-3">
+      <div className="mt-5 grid gap-4 border-t border-rule pt-4 sm:grid-cols-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
             Term cheaper in
           </p>
-          <p className="mt-1 text-lg font-black text-slate-900">
+          <p className="mt-1 text-lg font-black text-ink">
             {percent(contract.probability_term_cheaper)}
           </p>
-          <p className="text-xs text-slate-400">of simulated markets</p>
+          <p className="text-xs text-ink-faint">of simulated markets</p>
         </div>
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
             Spot tail risk
           </p>
-          <p className="mt-1 text-lg font-black text-slate-900">
-            {money(contract.spot_cvar80_cost_usd)}
-          </p>
-          <p className="text-xs text-slate-400">mean of the worst 20%</p>
+          <p className="mt-1 text-lg font-black text-ink">{money(contract.spot_cvar80_cost_usd)}</p>
+          <p className="text-xs text-ink-faint">mean of the worst 20%</p>
         </div>
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
             Certainty gain
           </p>
           <p
-            className={`mt-1 text-lg font-black ${contract.cost_certainty_gain_usd >= 0 ? 'text-emerald-700' : 'text-slate-900'}`}
+            className={`mt-1 text-lg font-black ${contract.cost_certainty_gain_usd >= 0 ? 'text-positive' : 'text-ink'}`}
           >
             {money(contract.cost_certainty_gain_usd)}
           </p>
-          <p className="text-xs text-slate-400">worst-case spot minus term</p>
+          <p className="text-xs text-ink-faint">worst-case spot minus term</p>
         </div>
       </div>
 
-      <p className="mt-4 rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-600">
-        {contract.rationale}
-      </p>
+      <p className="mt-4 bg-sunken p-3 text-xs leading-5 text-ink-muted">{contract.rationale}</p>
     </Panel>
   )
 }

@@ -1,25 +1,129 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
+/*
+ * Design tokens.
+ *
+ * The brief is a chartering desk, not a landing page. Everything here is
+ * chosen against that: ink on paper, hairline rules instead of shadows,
+ * square corners, and a palette narrow enough that colour means
+ * something when it appears.
+ *
+ * Deliberately absent: gradients, pastel fills, soft 16px radii, glow,
+ * and any accent colour that is not carrying information.
+ */
+@theme {
+  /* Paper is warm off-white. Pure #fff reads as a template. */
+  --color-paper: #fbfaf7;
+  --color-surface: #ffffff;
+  --color-sunken: #f4f2ed;
+
+  /* Ink, and two greys that do all the hierarchy work. */
+  --color-ink: #14171a;
+  --color-ink-muted: #5c6470;
+  --color-ink-faint: #8b929c;
+
+  /* Hairlines. Two weights only. */
+  --color-rule: #ddd9d0;
+  --color-rule-strong: #c2bdb2;
+
+  /*
+   * One brand colour, used for navigation and the primary action and
+   * nothing else. Deep navy reads maritime without being a theme.
+   */
+  --color-navy: #10243a;
+  --color-navy-soft: #1d3a57;
+
+  /*
+   * Semantic pair. These are the only other colours in the product, and
+   * they always mean the same thing: money saved or money at risk.
+   */
+  --color-positive: #1c6b4a;
+  --color-negative: #97272c;
+  --color-caution: #8a5a12;
+
+  --radius-panel: 2px;
+
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+}
+
 :root {
-  font-family: 'DM Sans', sans-serif;
-  color: #0f172a;
-  background: #f3f7f8;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
+
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   min-width: 320px;
 }
+
 button,
 input,
 select {
   font: inherit;
 }
-.font-display {
-  font-family: 'Space Grotesk', sans-serif;
+
+/*
+ * Every figure in the product is set in tabular mono so columns of
+ * numbers line up and a rate does not reflow as it ticks. This is the
+ * single most legible difference between a dashboard and a brochure.
+ */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Small caps label used above every value. */
+.label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+/* Hairline rule that survives fractional device pixels. */
+.rule {
+  border-color: var(--color-rule);
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/*
+ * Skeleton placeholder. Shows the shape of the answer while it is being
+ * computed rather than a spinner, so the layout does not jump.
+ */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-sunken);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.65), transparent);
+  animation: shimmer 1.4s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
 }

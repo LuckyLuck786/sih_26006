@@ -1,4 +1,4 @@
-import { SEVERITY_STYLES } from '../lib/format'
+import { SEVERITY_LABEL_TONE, SEVERITY_STYLES } from '../lib/format'
 import { Panel, Pill } from './ui'
 
 /**
@@ -11,10 +11,10 @@ import { Panel, Pill } from './ui'
  */
 
 const OVERALL_TONE = {
-  CRITICAL: 'bg-red-200 text-red-900',
-  HIGH: 'bg-orange-200 text-orange-900',
-  MEDIUM: 'bg-amber-200 text-amber-900',
-  LOW: 'bg-emerald-200 text-emerald-900',
+  CRITICAL: 'bg-red-200 text-negative',
+  HIGH: 'bg-orange-200 text-caution',
+  MEDIUM: 'bg-surface text-caution',
+  LOW: 'bg-emerald-200 text-positive',
 }
 
 const CATEGORY_LABEL = {
@@ -36,7 +36,7 @@ export default function RiskAlerts({ risk }) {
       title={`${risk.alert_count || 0} active warning${risk.alert_count === 1 ? '' : 's'}`}
       subtitle="Volatility, congestion, supply and decision fragility"
       right={
-        <Pill tone={OVERALL_TONE[risk.overall_risk] || 'bg-slate-200 text-slate-800'}>
+        <Pill tone={OVERALL_TONE[risk.overall_risk] || 'bg-slate-200 text-ink'}>
           {risk.overall_risk}
         </Pill>
       }
@@ -45,15 +45,17 @@ export default function RiskAlerts({ risk }) {
         {alerts.map((alert, index) => (
           <li
             key={`${alert.category}-${index}`}
-            className={`rounded-xl border p-3.5 ${SEVERITY_STYLES[alert.severity] || 'border-slate-200 bg-slate-50 text-slate-800'}`}
+            className={`border border-l-[3px] border-rule p-3.5 ${SEVERITY_STYLES[alert.severity] || 'border-l-rule-strong bg-surface'}`}
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <strong className="text-sm font-bold">{alert.title}</strong>
-              <span className="text-[10px] font-bold uppercase tracking-[0.1em] opacity-70">
-                {CATEGORY_LABEL[alert.category] || alert.category}
-              </span>
+              <strong
+                className={`text-[13px] font-semibold ${SEVERITY_LABEL_TONE[alert.severity] || 'text-ink'}`}
+              >
+                {alert.title}
+              </strong>
+              <span className="label">{CATEGORY_LABEL[alert.category] || alert.category}</span>
             </div>
-            <p className="mt-1.5 text-xs leading-5 opacity-90">{alert.message}</p>
+            <p className="mt-1.5 text-xs leading-5 text-ink-muted">{alert.message}</p>
           </li>
         ))}
       </ul>

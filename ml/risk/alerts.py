@@ -132,8 +132,8 @@ def assess_congestion(load_port, discharge_port, load_congestion, discharge_cong
                     "congestion",
                     "medium",
                     f"Watch congestion at {name}",
-                    f"{name} is at {congestion * 100:.0f}% utilisation — "
-                    f"manageable now, but worth monitoring before fixing.",
+                    f"{name} is at {congestion * 100:.0f}% utilisation. "
+                    f"Manageable now, but worth monitoring before fixing.",
                     round(congestion, 2),
                 )
             )
@@ -166,7 +166,7 @@ def assess_supply(vessel_supply, available_vessels=None):
                     "info",
                     "Ample tonnage available",
                     f"{vessel_supply} vessels are open on this lane. Competition "
-                    f"favours the charterer — there is room to negotiate.",
+                    f"favours the charterer, so there is room to negotiate.",
                     vessel_supply,
                 )
             )
@@ -199,7 +199,7 @@ def assess_decision_risk(net_expected_saving, waiting_cost, probability_waiting_
                 "Marginal charter/wait call",
                 f"Net expected saving (${net_expected_saving:,.2f}/t) is within "
                 f"1.5x the daily waiting cost. The recommendation could flip on "
-                f"a small rate move — treat it as a close call, not a signal.",
+                f"a small rate move. Treat it as a close call, not a signal.",
                 round(net_expected_saving, 2),
             )
         )
@@ -211,8 +211,8 @@ def assess_decision_risk(net_expected_saving, waiting_cost, probability_waiting_
                 "medium",
                 "Low conviction on timing",
                 f"Waiting beats fixing in only "
-                f"{probability_waiting_wins * 100:.0f}% of simulated markets "
-                f"— close to a coin flip. Prefer the option that preserves "
+                f"{probability_waiting_wins * 100:.0f}% of simulated markets, "
+                f"close to a coin flip. Prefer the option that preserves "
                 f"flexibility.",
                 round(probability_waiting_wins, 3),
             )

@@ -15,106 +15,124 @@ import { rate } from '../lib/format'
 /**
  * Forecast curve with the Q10-Q90 band.
  *
- * Rates are US dollars per tonne. The previous version formatted the axis
- * as Indian rupees in thousands, which mislabelled the model's output and
- * rendered every tick as "₹0k" once the values became per-tonne figures.
+ * The band is NOT drawn as two stacked areas. That is the usual trick,
+ * but the stack baseline is zero and Recharts widens any domain you give
+ * it to fit every value on the axis, so the axis ran 0 to 25 and a $22/t
+ * rate sat pinned to the top of the plot.
+ *
+ * Instead the upper bound is filled from the axis floor and the region
+ * below the lower bound is masked with the surface colour. Only `lower`
+ * and `upper` reach the axis, so the domain is the band itself.
  */
 export default function ForecastChart({ series = [], currentRate, horizonDays = 14 }) {
-  const data = Array.isArray(series)
-    ? series.map((point) => ({
-        ...point,
-        base: point.lower || 0,
-        band: Math.max(0, (point.upper || 0) - (point.lower || 0)),
-      }))
-    : []
+  const points = Array.isArray(series) ? series : []
+
+  const data = points.map((point) => ({ ...point }))
+
+  const values = data.flatMap((d) => [d.lower, d.upper]).filter((v) => Number.isFinite(v))
+
+  if (Number.isFinite(currentRate)) values.push(currentRate)
+
+  const min = values.length ? Math.min(...values) : 0
+  const max = values.length ? Math.max(...values) : 1
+
+  // Pad by a tenth of the band's own height so extremes are not flush
+  // against the plot edge.
+  const pad = Math.max((max - min) * 0.12, 0.25)
+
+  const domain = [Number((min - pad).toFixed(2)), Number((max + pad).toFixed(2))]
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <section className="rule border bg-surface">
+      <header className="rule flex flex-wrap items-end justify-between gap-2 border-b bg-sunken px-4 py-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.15em] text-teal-700">
-            Rate outlook
-          </p>
-          <h2 className="font-display mt-1 text-xl font-bold text-slate-900">Freight forecast</h2>
+          <p className="label">Rate outlook</p>
+          <h3 className="mt-1 text-[15px] font-semibold leading-tight text-ink">
+            Freight forecast
+          </h3>
         </div>
-        <p className="text-xs text-slate-400">{horizonDays}-day planning window · US$ per tonne</p>
-      </div>
+        <p className="text-[11px] text-ink-faint">{horizonDays}-day window, US$ per tonne</p>
+      </header>
 
       {data.length === 0 ? (
-        <div className="grid h-64 place-items-center text-sm text-slate-400">
-          Forecast data will appear after analysis.
+        <div className="grid h-56 place-items-center text-xs text-ink-faint">
+          Forecast appears after analysis.
         </div>
       ) : (
-        <div className="mt-5 h-72 w-full">
+        <div className="h-64 w-full px-2 py-3">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data} margin={{ top: 10, right: 12, left: 6, bottom: 8 }}>
-              <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
+            <ComposedChart data={data} margin={{ top: 8, right: 16, left: 4, bottom: 4 }}>
+              <CartesianGrid stroke="#e7e3da" strokeDasharray="2 3" vertical={false} />
               <XAxis
                 dataKey="day"
                 tickLine={false}
-                axisLine={false}
-                label={{
-                  value: 'Day',
-                  position: 'insideBottom',
-                  offset: -4,
-                  fill: '#64748b',
-                  fontSize: 12,
-                }}
+                axisLine={{ stroke: '#ddd9d0' }}
+                tick={{ fill: '#8b929c', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
+                interval="preserveStartEnd"
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                width={58}
+                width={52}
+                domain={domain}
+                allowDataOverflow
+                tick={{ fill: '#8b929c', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
                 tickFormatter={(value) => `$${Number(value).toFixed(0)}`}
-                domain={['dataMin - 1', 'dataMax + 1']}
-                label={{
-                  value: 'US$ / tonne',
-                  angle: -90,
-                  position: 'insideLeft',
-                  fill: '#64748b',
-                  fontSize: 12,
-                }}
               />
               <Tooltip
+                cursor={{ stroke: '#c2bdb2', strokeDasharray: '2 3' }}
+                contentStyle={{
+                  border: '1px solid #ddd9d0',
+                  borderRadius: 2,
+                  fontSize: 12,
+                  fontFamily: 'IBM Plex Mono',
+                  boxShadow: 'none',
+                }}
                 formatter={(value, name) => [
                   rate(value),
-                  name === 'expected' ? 'Expected' : name === 'band' ? 'Q10–Q90 band' : name,
+                  name === 'expected' ? 'Expected' : name === 'upper' ? 'Q90' : 'Q10',
                 ]}
                 labelFormatter={(day) => `Day ${day}`}
               />
+              {/* Upper bound filled to the floor, then everything below
+                  the lower bound painted back out in the surface colour.
+                  What remains visible is exactly the Q10-Q90 band. */}
               <Area
                 type="monotone"
-                dataKey="base"
-                stackId="range"
+                dataKey="upper"
                 stroke="none"
-                fill="transparent"
+                fill="#10243a"
+                fillOpacity={0.1}
+                isAnimationActive={false}
               />
               <Area
                 type="monotone"
-                dataKey="band"
-                stackId="range"
+                dataKey="lower"
                 stroke="none"
-                fill="#99f6e4"
-                fillOpacity={0.55}
+                fill="#ffffff"
+                fillOpacity={1}
+                isAnimationActive={false}
               />
               <Line
                 type="monotone"
                 dataKey="expected"
-                stroke="#0f766e"
-                strokeWidth={3}
+                stroke="#10243a"
+                strokeWidth={1.75}
                 dot={false}
-                activeDot={{ r: 5, fill: '#0f766e' }}
+                activeDot={{ r: 3, fill: '#10243a' }}
+                isAnimationActive={false}
               />
-              {typeof currentRate === 'number' && (
+              {Number.isFinite(currentRate) && (
                 <ReferenceLine
                   y={currentRate}
-                  stroke="#f59e0b"
-                  strokeDasharray="6 5"
+                  stroke="#97272c"
+                  strokeDasharray="3 3"
+                  strokeWidth={1}
                   label={{
-                    value: 'Rate today',
-                    position: 'insideTopRight',
-                    fill: '#b45309',
-                    fontSize: 12,
+                    value: 'rate today',
+                    position: 'insideTopLeft',
+                    fill: '#97272c',
+                    fontSize: 10,
                   }}
                 />
               )}

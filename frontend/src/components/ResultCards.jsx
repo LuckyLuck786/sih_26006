@@ -1,12 +1,22 @@
-import { money, rate, percent } from '../lib/format'
+import { money, percent, rate } from '../lib/format'
 import { Pill } from './ui'
 
-function Card({ label, children }) {
+/**
+ * Headline figures.
+ *
+ * A single hairline grid rather than a row of floating cards: the
+ * numbers are the content, so they get the weight and the chrome goes
+ * away. Column count follows how many figures there are, not a
+ * three-across template.
+ */
+
+function Metric({ label, value, hint, tone = 'text-ink', children }) {
   return (
-    <article className="min-h-28 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">{label}</p>
-      <div className="mt-3">{children}</div>
-    </article>
+    <div className="bg-surface px-4 py-3">
+      <p className="label">{label}</p>
+      {children ?? <p className={`num mt-1.5 text-xl font-semibold ${tone}`}>{value}</p>}
+      {hint && <p className="mt-1 text-[11px] leading-4 text-ink-faint">{hint}</p>}
+    </div>
   )
 }
 
@@ -17,121 +27,80 @@ export default function ResultCards({ result }) {
   const mc = result?.monte_carlo || {}
 
   const confidence = typeof result?.confidence === 'number' ? result.confidence : null
-  const risk = result?.risk?.overall_risk || '—'
+  const risk = result?.risk?.overall_risk
 
   const riskTone =
     risk === 'LOW'
-      ? 'bg-emerald-100 text-emerald-800'
-      : risk === 'CRITICAL'
-        ? 'bg-red-100 text-red-800'
-        : risk === 'HIGH'
-          ? 'bg-orange-100 text-orange-800'
-          : 'bg-amber-100 text-amber-800'
+      ? 'border-positive text-positive'
+      : risk === 'CRITICAL' || risk === 'HIGH'
+        ? 'border-negative text-negative'
+        : 'border-caution text-caution'
 
   const net = decision.net_expected_saving ?? 0
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      <Card label="Forecast range (per tonne)">
-        <div className="flex items-end justify-between gap-2">
-          <span className="text-xs text-slate-500">
-            Best
-            <br />
-            <strong className="text-sm text-slate-700">{rate(forecast.best)}</strong>
+    <div className="rule grid grid-cols-2 gap-px border bg-rule md:grid-cols-3 xl:grid-cols-4">
+      <Metric label="Rate today" value={rate(forecast.current_rate)} hint="per tonne, spot" />
+
+      <Metric
+        label={`Forecast, ${forecast.horizon_days ?? 14}d`}
+        value={rate(forecast.expected)}
+        hint={`Q10 ${rate(forecast.best)} / Q90 ${rate(forecast.worst)}`}
+      />
+
+      <Metric
+        label="Expected saving"
+        value={rate(decision.expected_saving)}
+        tone={net >= 0 ? 'text-positive' : 'text-negative'}
+        hint={`${rate(net)} net of waiting cost`}
+      />
+
+      <Metric
+        label="Probability rates fall"
+        value={
+          mc.probability_rate_decrease === undefined ? '—' : percent(mc.probability_rate_decrease)
+        }
+        hint={mc.simulations ? `${mc.simulations.toLocaleString()} simulated paths` : ''}
+      />
+
+      <Metric label="Confidence" hint="width of the forecast band">
+        <div className="mt-1.5 flex items-center gap-2">
+          <span className="num text-xl font-semibold text-ink">
+            {confidence === null ? '—' : percent(confidence)}
           </span>
-          <strong className="text-2xl font-black text-slate-900">{rate(forecast.expected)}</strong>
-          <span className="text-right text-xs text-slate-500">
-            Worst
-            <br />
-            <strong className="text-sm text-slate-700">{rate(forecast.worst)}</strong>
+          <span className="h-1 flex-1 bg-sunken">
+            <span
+              className="block h-full bg-navy"
+              style={{ width: `${(confidence || 0) * 100}%` }}
+            />
           </span>
         </div>
-        <p className="mt-2 text-xs text-slate-400">
-          Q10 / Q50 / Q90 at {forecast.horizon_days ?? 14} days
-        </p>
-      </Card>
+      </Metric>
 
-      <Card label="Rate today">
-        <strong className="text-2xl font-black text-slate-900">
-          {rate(forecast.current_rate)}
-        </strong>
-        <p className="mt-2 text-xs text-slate-400">Per tonne, spot</p>
-      </Card>
-
-      <Card label="Expected saving by waiting">
-        <div className={`text-2xl font-black ${net >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
-          {rate(decision.expected_saving)}
+      <Metric label="Risk" hint={`${result?.risk?.alert_count ?? 0} active warning(s)`}>
+        <div className="mt-1.5">
+          <Pill tone={riskTone}>{risk || '—'}</Pill>
         </div>
-        <p
-          className={`mt-2 text-xs font-semibold ${net >= 0 ? 'text-emerald-600' : 'text-red-600'}`}
-        >
-          {rate(net)} net of waiting cost
-        </p>
-      </Card>
+      </Metric>
 
-      <Card label="Confidence">
-        <strong className="text-2xl font-black text-slate-900">
-          {confidence === null ? '—' : percent(confidence)}
-        </strong>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
-          <div
-            className="h-full rounded-full bg-teal-500 transition-all"
-            style={{ width: `${(confidence || 0) * 100}%` }}
-          />
-        </div>
-        <p className="mt-2 text-xs text-slate-400">
-          Narrower forecast band means higher confidence
-        </p>
-      </Card>
+      <Metric
+        label="Recommended class"
+        hint={
+          chosen.cost_per_tonne_usd ? `${rate(chosen.cost_per_tonne_usd)} all-in per tonne` : ''
+        }
+      >
+        <p className="mt-1.5 text-xl font-semibold text-ink">{chosen.vessel_type || '—'}</p>
+      </Metric>
 
-      <Card label="Risk level">
-        <Pill tone={riskTone}>{risk}</Pill>
-        <p className="mt-3 text-xs text-slate-400">
-          {result?.risk?.alert_count
-            ? `${result.risk.alert_count} active warning(s)`
-            : 'No active warnings'}
-        </p>
-      </Card>
-
-      <Card label="Probability rates fall">
-        <strong className="text-2xl font-black text-slate-900">
-          {mc.probability_rate_decrease === undefined ? '—' : percent(mc.probability_rate_decrease)}
-        </strong>
-        <p className="mt-2 text-xs text-slate-400">
-          {mc.simulations
-            ? `${mc.simulations.toLocaleString()} Monte Carlo paths`
-            : 'Simulation pending'}
-        </p>
-      </Card>
-
-      <Card label="Recommended class">
-        <strong className="block text-lg font-black text-slate-900">
-          {chosen.vessel_type || '—'}
-        </strong>
-        <p className="mt-1 text-sm text-slate-500">
-          {chosen.cost_per_tonne_usd
-            ? `${rate(chosen.cost_per_tonne_usd)} all-in per tonne`
-            : 'Pending'}
-        </p>
-      </Card>
-
-      <Card label="Voyages required">
-        <strong className="text-2xl font-black text-slate-900">
-          {chosen.voyages_required ?? '—'}
-        </strong>
-        <p className="mt-2 text-xs text-slate-400">
-          {chosen.tonnes_per_voyage
-            ? `${chosen.tonnes_per_voyage.toLocaleString()} t per voyage`
-            : ''}
-        </p>
-      </Card>
-
-      <Card label="Total landed cost">
-        <strong className="text-2xl font-black text-slate-900">
-          {money(chosen.total_cost_usd)}
-        </strong>
-        <p className="mt-2 text-xs text-slate-400">Freight, hire, bunkers and port charges</p>
-      </Card>
+      <Metric
+        label="Total landed cost"
+        value={money(chosen.total_cost_usd)}
+        hint={
+          chosen.voyages_required
+            ? `${chosen.voyages_required} voyage(s), ${chosen.tonnes_per_voyage?.toLocaleString()} t each`
+            : 'freight, hire, bunkers, port charges'
+        }
+      />
     </div>
   )
 }

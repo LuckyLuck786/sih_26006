@@ -132,12 +132,12 @@ export default function VoyageMap({ route, fleet = [] }) {
       title={`${route.load_port} → ${route.discharge_port}`}
       subtitle={`${route.distance_nm?.toLocaleString()} nm great-circle routing`}
       right={
-        <Pill tone={live ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}>
+        <Pill tone={live ? 'bg-surface text-positive' : 'bg-sunken text-ink-muted'}>
           {live ? 'Live AIS' : 'Simulated fleet'}
         </Pill>
       }
     >
-      <div className="overflow-hidden rounded-xl border border-slate-200">
+      <div className="overflow-hidden border border-rule">
         <MapContainer
           center={from}
           zoom={3}
@@ -204,7 +204,7 @@ export default function VoyageMap({ route, fleet = [] }) {
         </MapContainer>
       </div>
 
-      <p className="mt-3 text-xs leading-5 text-slate-500">
+      <p className="mt-3 text-xs leading-5 text-ink-muted">
         {live
           ? `Showing ${vessels.length} live AIS positions near ${route.discharge_port}, via Data Docked.`
           : `Showing the ${vessels.length}-vessel tracked fleet. Configure DATADOCKED_API_KEY on the server to overlay live AIS positions.`}
