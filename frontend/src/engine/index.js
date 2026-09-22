@@ -232,6 +232,8 @@ export function analyzeShipmentLocal(payload) {
       discharge_port_unlocode: dischargePort.unlocode,
       discharge_port_lat: dischargePort.latitude,
       discharge_port_lon: dischargePort.longitude,
+      load_port_max_draft: loadPort.max_draft,
+      discharge_port_max_draft: dischargePort.max_draft,
       distance_nm: route.distance,
     },
     forecast: {

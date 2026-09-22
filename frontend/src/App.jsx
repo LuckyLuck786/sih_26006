@@ -18,6 +18,8 @@ import VoyageMap from './components/VoyageMap'
 import ModelCard from './components/ModelCard'
 import PipelineStrip from './components/PipelineStrip'
 import StatusBar from './components/StatusBar'
+import ScenarioCompare from './components/ScenarioCompare'
+import Sensitivity from './components/Sensitivity'
 
 import { analyzeShipment } from './services/api'
 import { initialValues } from './lib/shipmentDefaults'
@@ -34,6 +36,8 @@ const TABS = [
   { id: 'idle', label: 'Idle time', note: 'c' },
   { id: 'risk', label: 'Risk', note: 'd' },
   { id: 'contract', label: 'Contract' },
+  { id: 'compare', label: 'Compare' },
+  { id: 'sensitivity', label: 'Sensitivity' },
 ]
 
 export default function App() {
@@ -182,6 +186,8 @@ export default function App() {
                     {tab === 'idle' && <IdlePanel idle={result.idle} />}
                     {tab === 'risk' && <RiskAlerts risk={result.risk} />}
                     {tab === 'contract' && <ContractStrategy contract={result.contract_strategy} />}
+                    {tab === 'compare' && <ScenarioCompare request={result.request} />}
+                    {tab === 'sensitivity' && <Sensitivity request={result.request} />}
                   </>
                 ) : (
                   <>
