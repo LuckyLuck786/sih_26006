@@ -11,6 +11,14 @@ import {
 } from 'recharts'
 
 import { rate } from '../lib/format'
+import { useTheme } from '../lib/theme'
+
+/** Resolve a design token to its current computed value. */
+function token(name, fallback) {
+  if (typeof window === 'undefined') return fallback
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return value || fallback
+}
 
 /**
  * Forecast curve with the Q10-Q90 band.
@@ -25,6 +33,16 @@ import { rate } from '../lib/format'
  * and `upper` reach the axis, so the domain is the band itself.
  */
 export default function ForecastChart({ series = [], currentRate, horizonDays = 14 }) {
+  // Re-read on theme change so the chart follows the tokens.
+  const { theme } = useTheme()
+
+  const ink = token('--color-navy', '#10243a')
+  const faint = token('--color-ink-faint', '#8b929c')
+  const rule = token('--color-rule', '#ddd9d0')
+  const surface = token('--color-surface', '#fffdf8')
+  const negative = token('--color-negative', '#97272c')
+  void theme
+
   const points = Array.isArray(series) ? series : []
 
   const data = points.map((point) => ({ ...point }))
@@ -62,12 +80,12 @@ export default function ForecastChart({ series = [], currentRate, horizonDays = 
         <div className="h-64 w-full px-2 py-3">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data} margin={{ top: 8, right: 16, left: 4, bottom: 4 }}>
-              <CartesianGrid stroke="#e7e3da" strokeDasharray="2 3" vertical={false} />
+              <CartesianGrid stroke={rule} strokeDasharray="2 3" vertical={false} />
               <XAxis
                 dataKey="day"
                 tickLine={false}
-                axisLine={{ stroke: '#ddd9d0' }}
-                tick={{ fill: '#8b929c', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
+                axisLine={{ stroke: rule }}
+                tick={{ fill: faint, fontSize: 11, fontFamily: 'IBM Plex Mono' }}
                 interval="preserveStartEnd"
               />
               <YAxis
@@ -76,13 +94,15 @@ export default function ForecastChart({ series = [], currentRate, horizonDays = 
                 width={52}
                 domain={domain}
                 allowDataOverflow
-                tick={{ fill: '#8b929c', fontSize: 11, fontFamily: 'IBM Plex Mono' }}
+                tick={{ fill: faint, fontSize: 11, fontFamily: 'IBM Plex Mono' }}
                 tickFormatter={(value) => `$${Number(value).toFixed(0)}`}
               />
               <Tooltip
-                cursor={{ stroke: '#c2bdb2', strokeDasharray: '2 3' }}
+                cursor={{ stroke: faint, strokeDasharray: '2 3' }}
                 contentStyle={{
-                  border: '1px solid #ddd9d0',
+                  border: `1px solid ${rule}`,
+                  background: surface,
+                  color: 'inherit',
                   borderRadius: 2,
                   fontSize: 12,
                   fontFamily: 'IBM Plex Mono',
@@ -101,7 +121,7 @@ export default function ForecastChart({ series = [], currentRate, horizonDays = 
                 type="monotone"
                 dataKey="upper"
                 stroke="none"
-                fill="#10243a"
+                fill={ink}
                 fillOpacity={0.1}
                 isAnimationActive={false}
               />
@@ -109,29 +129,29 @@ export default function ForecastChart({ series = [], currentRate, horizonDays = 
                 type="monotone"
                 dataKey="lower"
                 stroke="none"
-                fill="#ffffff"
+                fill={surface}
                 fillOpacity={1}
                 isAnimationActive={false}
               />
               <Line
                 type="monotone"
                 dataKey="expected"
-                stroke="#10243a"
+                stroke={ink}
                 strokeWidth={1.75}
                 dot={false}
-                activeDot={{ r: 3, fill: '#10243a' }}
+                activeDot={{ r: 3, fill: ink }}
                 isAnimationActive={false}
               />
               {Number.isFinite(currentRate) && (
                 <ReferenceLine
                   y={currentRate}
-                  stroke="#97272c"
+                  stroke={negative}
                   strokeDasharray="3 3"
                   strokeWidth={1}
                   label={{
                     value: 'rate today',
                     position: 'insideTopLeft',
-                    fill: '#97272c',
+                    fill: negative,
                     fontSize: 10,
                   }}
                 />

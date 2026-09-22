@@ -5,9 +5,11 @@
  * session is bound to. No glow, no badge, no gradient.
  */
 import { useFx } from '../lib/currency'
+import { useTheme } from '../lib/theme'
 
 export default function Header({ meta }) {
   const fx = useFx()
+  const { theme, toggle } = useTheme()
 
   return (
     <header className="border-b border-navy-soft bg-navy text-white">
@@ -34,6 +36,16 @@ export default function Header({ meta }) {
               <dd className="num font-medium text-white/90">{item.value}</dd>
             </div>
           ))}
+
+          <button
+            type="button"
+            onClick={toggle}
+            aria-pressed={theme === 'dark'}
+            title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+            className="border border-white/25 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/70 transition-colors hover:border-white/50 hover:text-white"
+          >
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
         </dl>
       </div>
     </header>

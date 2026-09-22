@@ -27,7 +27,7 @@ export default [
       // provider component.
       'react-refresh/only-export-components': [
         'warn',
-        { allowConstantExport: true, allowExportNames: ['useFx'] },
+        { allowConstantExport: true, allowExportNames: ['useFx', 'useTheme'] },
       ],
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },

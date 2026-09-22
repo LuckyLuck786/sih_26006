@@ -20,6 +20,7 @@ import PipelineStrip from './components/PipelineStrip'
 import StatusBar from './components/StatusBar'
 import ScenarioCompare from './components/ScenarioCompare'
 import Sensitivity from './components/Sensitivity'
+import BatchIngest from './components/BatchIngest'
 
 import { analyzeShipment } from './services/api'
 import { initialValues } from './lib/shipmentDefaults'
@@ -38,6 +39,7 @@ const TABS = [
   { id: 'contract', label: 'Contract' },
   { id: 'compare', label: 'Compare' },
   { id: 'sensitivity', label: 'Sensitivity' },
+  { id: 'batch', label: 'Batch' },
 ]
 
 export default function App() {
@@ -188,6 +190,7 @@ export default function App() {
                     {tab === 'contract' && <ContractStrategy contract={result.contract_strategy} />}
                     {tab === 'compare' && <ScenarioCompare request={result.request} />}
                     {tab === 'sensitivity' && <Sensitivity request={result.request} />}
+                    {tab === 'batch' && <BatchIngest />}
                   </>
                 ) : (
                   <>

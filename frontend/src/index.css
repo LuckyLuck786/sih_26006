@@ -120,3 +120,52 @@ select {
     animation: none;
   }
 }
+
+/*
+ * Dark theme.
+ *
+ * Tailwind v4 compiles every utility to var(--color-*), so redefining
+ * the tokens under a selector re-themes the whole interface without a
+ * second set of classes. Only the tokens change; no component knows
+ * which theme is active.
+ *
+ * The palette is warmed slightly off pure neutral for the same reason
+ * the light one is: a dead-grey dark theme reads as a default.
+ */
+:root[data-theme='dark'] {
+  --color-paper: #101317;
+  --color-surface: #171b21;
+  --color-sunken: #1e232b;
+
+  --color-ink: #e7eaee;
+  --color-ink-muted: #a3acba;
+  --color-ink-faint: #737d8c;
+
+  --color-rule: #2b313b;
+  --color-rule-strong: #3d4653;
+
+  /* Navy has to lighten or it disappears into the background. */
+  --color-navy: #3a6491;
+  --color-navy-soft: #4a7cb0;
+
+  /* Semantic pair, lifted for contrast on a dark surface. */
+  --color-positive: #56b487;
+  --color-negative: #e08089;
+  --color-caution: #d9a441;
+
+  color-scheme: dark;
+}
+
+/*
+ * OpenStreetMap only serves a light raster tile. Inverting and rotating
+ * the hue back is the conventional way to sit it on a dark surface;
+ * markers and the route line are drawn as SVG above the tile layer and
+ * are excluded so their colours stay true.
+ */
+:root[data-theme='dark'] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9);
+}
+
+:root[data-theme='dark'] .leaflet-container {
+  background: var(--color-sunken);
+}

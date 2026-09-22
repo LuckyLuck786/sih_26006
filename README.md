@@ -37,6 +37,12 @@ static mock.
 | **Objective:** spot → term contracts | `ml/decision/contract_strategy.py` |
 | Dashboard | `frontend/` — React + Vite, one tab per requirement |
 
+Beyond the lettered requirements the dashboard also carries an execution trace of the
+ten-stage pipeline with measured timings, a port comparison that runs one parcel against
+all seven discharge ports, a sensitivity sweep that reports where a recommendation
+crosses, and batch ingestion for a whole parcel list. All of it runs in the browser, so a
+procurement schedule is never uploaded anywhere.
+
 All five origins named in the problem statement (Australia, United States, Mozambique,
 Russia, Indonesia) and all seven East Coast ports (Paradip, Vizag, Gangavaram, Gopalpur,
 Dhamra, **Sagar-Sandheads**, Haldia) are modelled.
