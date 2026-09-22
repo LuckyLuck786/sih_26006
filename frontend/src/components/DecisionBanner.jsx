@@ -10,16 +10,10 @@ import { Pill } from './ui'
 export default function DecisionBanner({ decision, reason, placeholder = false }) {
   const isWait = decision === 'WAIT'
 
-  const accent = placeholder
-    ? 'border-l-rule-strong'
-    : isWait
-      ? 'border-l-positive'
-      : 'border-l-caution'
-
   const valueTone = placeholder ? 'text-ink-faint' : isWait ? 'text-positive' : 'text-caution'
 
   return (
-    <section className={`rule border border-l-[3px] bg-surface px-5 py-4 ${accent}`}>
+    <section className="rule border bg-surface px-5 py-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="label">Charter recommendation</p>

@@ -155,6 +155,19 @@ payload arithmetic that decides vessel class.
 
 ---
 
+## Currency
+
+Dry bulk freight is quoted in US dollars per tonne worldwide, so the engine computes in
+USD and the market rate is shown in USD. Every figure is also converted to rupees, which
+is what an Indian procurement desk budgets and reports in, grouped in lakh and crore.
+
+The USD/INR rate comes from the European Central Bank daily reference rate via
+Frankfurter, with open.er-api.com as a fallback and a pinned rate as a last resort. The
+rate and its date are shown in the masthead rather than buried, because a converted total
+is only meaningful alongside the rate used. Both sources are keyless.
+
+---
+
 ## API keys
 
 **None are required.** The dashboard, the models and the full decision engine run with no

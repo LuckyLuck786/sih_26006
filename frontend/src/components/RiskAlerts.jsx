@@ -1,4 +1,4 @@
-import { SEVERITY_LABEL_TONE, SEVERITY_STYLES } from '../lib/format'
+import { SEVERITY_LABEL_TONE, SEVERITY_PILL } from '../lib/format'
 import { Panel, Pill } from './ui'
 
 /**
@@ -43,10 +43,7 @@ export default function RiskAlerts({ risk }) {
     >
       <ul className="space-y-3">
         {alerts.map((alert, index) => (
-          <li
-            key={`${alert.category}-${index}`}
-            className={`border border-l-[3px] border-rule p-3.5 ${SEVERITY_STYLES[alert.severity] || 'border-l-rule-strong bg-surface'}`}
-          >
+          <li key={`${alert.category}-${index}`} className="rule border bg-surface p-3.5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <strong
                 className={`text-[13px] font-semibold ${SEVERITY_LABEL_TONE[alert.severity] || 'text-ink'}`}

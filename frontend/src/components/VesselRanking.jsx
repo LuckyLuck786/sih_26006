@@ -1,4 +1,6 @@
 import { money, rate, tonnes, percent } from '../lib/format'
+import { inrCrore, inrRate } from '../lib/inr'
+import { useFx } from '../lib/currency'
 import { Panel, Pill } from './ui'
 
 /**
@@ -11,6 +13,8 @@ import { Panel, Pill } from './ui'
  * modelling.
  */
 export default function VesselRanking({ recommendation, route }) {
+  const fx = useFx()
+
   if (!recommendation) return null
 
   const {
@@ -47,7 +51,7 @@ export default function VesselRanking({ recommendation, route }) {
             <tr className="border-b border-rule text-left text-[11px] uppercase tracking-[0.08em] text-ink-muted">
               <th className="py-2 pr-3 font-bold">#</th>
               <th className="py-2 pr-3 font-bold">Class</th>
-              <th className="py-2 pr-3 text-right font-bold">All-in $/t</th>
+              <th className="py-2 pr-3 text-right font-semibold">All-in /t</th>
               <th className="py-2 pr-3 text-right font-bold">Payload</th>
               <th className="py-2 pr-3 text-right font-bold">Used</th>
               <th className="py-2 pr-3 text-right font-bold">Voyages</th>
@@ -73,8 +77,11 @@ export default function VesselRanking({ recommendation, route }) {
                       {option.dwt.toLocaleString()} dwt
                     </span>
                   </td>
-                  <td className="py-2.5 pr-3 text-right font-bold text-ink">
-                    {rate(option.cost_per_tonne_usd)}
+                  <td className="num py-2.5 pr-3 text-right font-semibold text-ink">
+                    {inrRate(option.cost_per_tonne_usd, fx.rate)}
+                    <span className="block text-[10px] font-normal text-ink-faint">
+                      {rate(option.cost_per_tonne_usd)}
+                    </span>
                   </td>
                   <td className="py-2.5 pr-3 text-right text-ink">
                     {tonnes(option.max_payload_tonnes)}
@@ -84,7 +91,9 @@ export default function VesselRanking({ recommendation, route }) {
                   </td>
                   <td className="py-2.5 pr-3 text-right text-ink">{option.voyages_required}</td>
                   <td className="py-2.5 pr-3 text-right text-ink">{option.round_trip_days} d</td>
-                  <td className="py-2.5 text-right text-ink">{money(option.total_cost_usd)}</td>
+                  <td className="num py-2.5 text-right text-ink">
+                    {inrCrore(option.total_cost_usd, fx.rate)}
+                  </td>
                 </tr>
               )
             })}

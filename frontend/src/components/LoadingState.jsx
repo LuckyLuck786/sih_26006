@@ -15,7 +15,7 @@ export default function LoadingState() {
     <div className="space-y-3" aria-busy="true" aria-live="polite">
       <span className="sr-only">Computing the charter decision</span>
 
-      <div className="rule border border-l-[3px] border-l-rule-strong bg-surface px-5 py-4">
+      <div className="rule border bg-surface px-5 py-4">
         <Block className="h-2.5 w-32" />
         <Block className="mt-3 h-6 w-44" />
         <Block className="mt-3 h-3 w-full max-w-lg" />

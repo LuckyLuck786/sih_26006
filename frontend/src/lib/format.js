@@ -40,16 +40,16 @@ export const percent = (value, dp = 0) =>
 /*
  * Severity tokens.
  *
- * Severity is carried by the left rule and the label tone, never by a
- * filled background: a page of tinted cards stops reading as data. The
- * four levels stay distinguishable without introducing new hues.
+ * Severity is carried by a bordered chip and the title tone, never by a
+ * filled background or a coloured left stripe: tinted cards stop reading
+ * as data, and the stripe is its own cliche.
  */
-export const SEVERITY_STYLES = {
-  critical: 'border-l-negative bg-surface',
-  high: 'border-l-caution bg-surface',
-  medium: 'border-l-rule-strong bg-surface',
-  low: 'border-l-positive bg-surface',
-  info: 'border-l-navy bg-surface',
+export const SEVERITY_PILL = {
+  critical: 'border-negative text-negative',
+  high: 'border-caution text-caution',
+  medium: 'border-rule-strong text-ink-muted',
+  low: 'border-positive text-positive',
+  info: 'border-navy text-navy',
 }
 
 export const SEVERITY_LABEL_TONE = {

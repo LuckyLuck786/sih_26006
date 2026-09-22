@@ -15,7 +15,7 @@
 @theme {
   /* Paper is warm off-white. Pure #fff reads as a template. */
   --color-paper: #fbfaf7;
-  --color-surface: #ffffff;
+  --color-surface: #fffdf8;
   --color-sunken: #f4f2ed;
 
   /* Ink, and two greys that do all the hierarchy work. */
@@ -97,33 +97,26 @@ select {
   border-color: var(--color-rule);
 }
 
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
+@keyframes pulse-dim {
+  50% {
+    opacity: 0.45;
   }
 }
 
 /*
  * Skeleton placeholder. Shows the shape of the answer while it is being
  * computed rather than a spinner, so the layout does not jump.
+ *
+ * Dims rather than sweeping a highlight across itself: the usual shimmer
+ * is a moving linear-gradient, and this design has no gradients in it.
  */
 .skeleton {
-  position: relative;
-  overflow: hidden;
   background: var(--color-sunken);
-}
-
-.skeleton::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.65), transparent);
-  animation: shimmer 1.4s infinite;
+  animation: pulse-dim 1.6s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton::after {
+  .skeleton {
     animation: none;
   }
 }

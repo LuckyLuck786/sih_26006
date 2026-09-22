@@ -1,4 +1,6 @@
 import { money, percent, rate } from '../lib/format'
+import { inrCrore, inrRate } from '../lib/inr'
+import { useFx } from '../lib/currency'
 import { Pill } from './ui'
 
 /**
@@ -21,6 +23,7 @@ function Metric({ label, value, hint, tone = 'text-ink', children }) {
 }
 
 export default function ResultCards({ result }) {
+  const fx = useFx()
   const forecast = result?.forecast || {}
   const decision = result?.decision || {}
   const chosen = result?.vessel_recommendation?.chosen || {}
@@ -40,19 +43,23 @@ export default function ResultCards({ result }) {
 
   return (
     <div className="rule grid grid-cols-2 gap-px border bg-rule md:grid-cols-3 xl:grid-cols-4">
-      <Metric label="Rate today" value={rate(forecast.current_rate)} hint="per tonne, spot" />
+      <Metric
+        label="Rate today"
+        value={rate(forecast.current_rate)}
+        hint={`${inrRate(forecast.current_rate, fx.rate)} per tonne, spot`}
+      />
 
       <Metric
         label={`Forecast, ${forecast.horizon_days ?? 14}d`}
         value={rate(forecast.expected)}
-        hint={`Q10 ${rate(forecast.best)} / Q90 ${rate(forecast.worst)}`}
+        hint={`${inrRate(forecast.expected, fx.rate)} · Q10 ${rate(forecast.best)} / Q90 ${rate(forecast.worst)}`}
       />
 
       <Metric
         label="Expected saving"
         value={rate(decision.expected_saving)}
         tone={net >= 0 ? 'text-positive' : 'text-negative'}
-        hint={`${rate(net)} net of waiting cost`}
+        hint={`${inrRate(decision.expected_saving, fx.rate)} · ${rate(net)} net of waiting cost`}
       />
 
       <Metric
@@ -94,10 +101,10 @@ export default function ResultCards({ result }) {
 
       <Metric
         label="Total landed cost"
-        value={money(chosen.total_cost_usd)}
+        value={inrCrore(chosen.total_cost_usd, fx.rate)}
         hint={
           chosen.voyages_required
-            ? `${chosen.voyages_required} voyage(s), ${chosen.tonnes_per_voyage?.toLocaleString()} t each`
+            ? `${money(chosen.total_cost_usd)} · ${chosen.voyages_required} voyage(s)`
             : 'freight, hire, bunkers, port charges'
         }
       />

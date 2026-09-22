@@ -1,4 +1,6 @@
 import { money, percent, SEVERITY_DOT } from '../lib/format'
+import { inr } from '../lib/inr'
+import { useFx } from '../lib/currency'
 import { Panel, Stat, Pill } from './ui'
 
 /**
@@ -8,6 +10,8 @@ import { Panel, Stat, Pill } from './ui'
  * already carried the cargo handling rates this needs.
  */
 export default function IdlePanel({ idle }) {
+  const fx = useFx()
+
   if (!idle) return null
 
   const segments = [
@@ -76,8 +80,8 @@ export default function IdlePanel({ idle }) {
         />
         <Stat
           label="Demurrage exposure"
-          value={money(idle.demurrage_cost_usd)}
-          hint={`${idle.demurrage_days} days beyond laytime`}
+          value={inr(idle.demurrage_cost_usd, fx.rate)}
+          hint={`${money(idle.demurrage_cost_usd)} · ${idle.demurrage_days} days beyond laytime`}
           tone={idle.demurrage_cost_usd > 0 ? 'text-negative' : 'text-positive'}
         />
       </div>

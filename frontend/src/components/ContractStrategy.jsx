@@ -1,4 +1,6 @@
-import { money, rate, percent } from '../lib/format'
+import { percent, rate } from '../lib/format'
+import { inrCrore, inrRate } from '../lib/inr'
+import { useFx } from '../lib/currency'
 import { Panel, Pill } from './ui'
 
 /**
@@ -10,6 +12,8 @@ import { Panel, Pill } from './ui'
  * The first prototype collected a contract duration and never used it.
  */
 export default function ContractStrategy({ contract }) {
+  const fx = useFx()
+
   if (!contract) return null
 
   const pickTerm = contract.recommendation === 'TERM'
@@ -29,7 +33,7 @@ export default function ContractStrategy({ contract }) {
       expected: contract.term_total_cost_usd,
       worst: contract.term_total_cost_usd,
       best: contract.term_total_cost_usd,
-      note: `One fixed rate of ${rate(contract.term_rate_per_tonne)}/t, ${contract.term_premium_pct}% over expected spot`,
+      note: `One fixed rate of ${inrRate(contract.term_rate_per_tonne, fx.rate)}/t (${rate(contract.term_rate_per_tonne)}), ${contract.term_premium_pct}% over expected spot`,
     },
   ]
 
@@ -56,7 +60,9 @@ export default function ContractStrategy({ contract }) {
             >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <strong className="text-sm font-bold text-ink">{option.title}</strong>
-                <span className="text-lg font-black text-ink">{money(option.expected)}</span>
+                <span className="num text-lg font-semibold text-ink">
+                  {inrCrore(option.expected, fx.rate)}
+                </span>
               </div>
 
               {/* Range bar: where the outcome can land. A term deal is a
@@ -72,8 +78,8 @@ export default function ContractStrategy({ contract }) {
               </div>
 
               <div className="mt-2 flex justify-between text-[11px] text-ink-muted">
-                <span>{money(option.best)} best</span>
-                <span>{money(option.worst)} worst</span>
+                <span className="num">{inrCrore(option.best, fx.rate)} best</span>
+                <span className="num">{inrCrore(option.worst, fx.rate)} worst</span>
               </div>
 
               <p className="mt-2 text-xs leading-5 text-ink-muted">{option.note}</p>
@@ -96,7 +102,9 @@ export default function ContractStrategy({ contract }) {
           <p className="text-xs font-bold uppercase tracking-[0.1em] text-ink-muted">
             Spot tail risk
           </p>
-          <p className="mt-1 text-lg font-black text-ink">{money(contract.spot_cvar80_cost_usd)}</p>
+          <p className="num mt-1 text-lg font-semibold text-ink">
+            {inrCrore(contract.spot_cvar80_cost_usd, fx.rate)}
+          </p>
           <p className="text-xs text-ink-faint">mean of the worst 20%</p>
         </div>
         <div>
@@ -106,7 +114,7 @@ export default function ContractStrategy({ contract }) {
           <p
             className={`mt-1 text-lg font-black ${contract.cost_certainty_gain_usd >= 0 ? 'text-positive' : 'text-ink'}`}
           >
-            {money(contract.cost_certainty_gain_usd)}
+            {inrCrore(contract.cost_certainty_gain_usd, fx.rate)}
           </p>
           <p className="text-xs text-ink-faint">worst-case spot minus term</p>
         </div>
