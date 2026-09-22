@@ -55,11 +55,9 @@ export async function analyzeShipment(payload) {
  * resolves: on any failure it reports the simulated fleet instead, and
  * the caller shows which source was used.
  */
-export async function fetchNearbyVessels({ latitude, longitude, radius = 50 }) {
+export async function fetchNearbyVessels({ latitude, longitude }) {
   try {
-    const response = await fetch(
-      `/api/ais?latitude=${latitude}&longitude=${longitude}&radius=${radius}`,
-    )
+    const response = await fetch(`/api/ais?latitude=${latitude}&longitude=${longitude}`)
     if (!response.ok) return { source: 'simulated', reason: `http_${response.status}`, vessels: [] }
     return await response.json()
   } catch {

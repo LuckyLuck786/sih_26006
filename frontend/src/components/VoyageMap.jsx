@@ -86,7 +86,6 @@ export default function VoyageMap({ route, fleet = [] }) {
     fetchNearbyVessels({
       latitude: route.discharge_port_lat,
       longitude: route.discharge_port_lon,
-      radius: 120,
     }).then((result) => {
       if (!cancelled) setAis(result)
     })
@@ -108,10 +107,14 @@ export default function VoyageMap({ route, fleet = [] }) {
   const vessels = live
     ? ais.vessels
         .map((v) => ({
-          name: v.vessel_name || v.name || v.SHIPNAME || 'Vessel',
-          type: v.vessel_type || v.TYPE_NAME || '',
-          lat: Number(v.latitude ?? v.LAT),
-          lon: Number(v.longitude ?? v.LON),
+          // Live AIS returns name/typeSpecific with coordinates as
+          // strings; the simulated fleet uses vessel_name/vessel_type.
+          name: v.name || v.vessel_name || 'Vessel',
+          type: v.typeSpecific || v.vessel_type || '',
+          mmsi: v.mmsi,
+          speed: v.speed,
+          lat: Number(v.latitude),
+          lon: Number(v.longitude),
         }))
         .filter((v) => Number.isFinite(v.lat) && Number.isFinite(v.lon))
     : fleet.map((v) => ({

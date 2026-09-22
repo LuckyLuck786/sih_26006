@@ -22,15 +22,22 @@ const DATADOCKED_BASE = 'https://datadocked.com/api/vessels_operations'
 // The free tier is metered, so identical lookups within this window are
 // served from memory rather than spending another credit. Serverless
 // instances are recycled, which makes this a best-effort cache.
+const SUPPORTED_RADIUS_NM = 50
+
 const CACHE_TTL_MS = 10 * 60 * 1000
 const cache = new Map()
 
 export default async function handler(request, response) {
-  const { latitude, longitude, radius = '50' } = request.query || {}
+  const { latitude, longitude } = request.query || {}
 
   const lat = Number(latitude)
   const lon = Number(longitude)
-  const circleRadius = Math.min(Math.max(parseInt(radius, 10) || 50, 1), 500)
+
+  // Data Docked rejects every circle_radius except 50 with HTTP 400 —
+  // the parameter is documented as a free integer but is not one. The
+  // value is pinned rather than passed through so a caller asking for a
+  // wider sweep degrades to a working request instead of an error.
+  const circleRadius = SUPPORTED_RADIUS_NM
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
     return response.status(400).json({ error: 'latitude and longitude are required' })
