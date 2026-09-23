@@ -21,6 +21,8 @@ import StatusBar from './components/StatusBar'
 import ScenarioCompare from './components/ScenarioCompare'
 import Sensitivity from './components/Sensitivity'
 import BatchIngest from './components/BatchIngest'
+import Backtest from './components/Backtest'
+import Provenance from './components/Provenance'
 
 import { analyzeShipment } from './services/api'
 import { initialValues } from './lib/shipmentDefaults'
@@ -40,6 +42,8 @@ const TABS = [
   { id: 'compare', label: 'Compare' },
   { id: 'sensitivity', label: 'Sensitivity' },
   { id: 'batch', label: 'Batch' },
+  { id: 'backtest', label: 'Backtest' },
+  { id: 'provenance', label: 'Provenance' },
 ]
 
 export default function App() {
@@ -191,6 +195,8 @@ export default function App() {
                     {tab === 'compare' && <ScenarioCompare request={result.request} />}
                     {tab === 'sensitivity' && <Sensitivity request={result.request} />}
                     {tab === 'batch' && <BatchIngest />}
+                    {tab === 'backtest' && <Backtest />}
+                    {tab === 'provenance' && <Provenance />}
                   </>
                 ) : (
                   <>
