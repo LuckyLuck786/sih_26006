@@ -1,0 +1,30 @@
+# Render blueprint for the FastAPI decision service.
+#
+# The dashboard does not need this: the browser engine computes the same
+# decision without any backend. This exists so the Python pipeline —
+# the actual LightGBM models, not the ridge approximation — can be
+# reached over HTTP, and so the architecture is a running service rather
+# than a directory in the repository.
+#
+# Deploy: render.com -> New -> Blueprint -> point at this repository.
+#
+# Free instances sleep after inactivity and take roughly 50 seconds to
+# wake. Hit /health before a demo.
+
+services:
+  - type: web
+    name: harborline-api
+    runtime: python
+    plan: free
+    region: singapore
+    rootDir: .
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      # Optional. Enables live AIS on /ais/vessels-by-area.
+      # Set the value in the Render dashboard, never in this file.
+      - key: DATADOCKED_API_KEY
+        sync: false

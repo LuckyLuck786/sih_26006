@@ -198,6 +198,29 @@ Maps use **OpenStreetMap** tiles, which need no key or account.
 
 ---
 
+## Deploying the API
+
+The dashboard needs no backend: the browser engine computes the same decision. Deploy the
+API when you want the real LightGBM models reachable over HTTP rather than the browser's
+ridge approximation.
+
+`render.yaml` is a Render blueprint. Point Render at this repository and it builds from
+`requirements.txt` and serves `backend.main:app`. Free instances sleep after inactivity
+and take roughly 50 seconds to wake, so call `/health` before a demo.
+
+Then point the dashboard at it:
+
+```bash
+# frontend/.env.local
+VITE_USE_MOCK=false
+VITE_API_BASE_URL=https://<your-service>.onrender.com
+```
+
+`DATADOCKED_API_KEY` is declared with `sync: false`, so Render prompts for it and it is
+never committed.
+
+---
+
 ## Security headers
 
 `frontend/vercel.json` sets CSP, `X-Frame-Options`, `X-Content-Type-Options`,
